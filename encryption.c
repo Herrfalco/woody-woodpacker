@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/03 18:13:36 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/03 19:28:41 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,6 @@ void		sub_word(uint8_t *word, method_t type) {
 }
 
 void		sub_bytes(uint8_t *block, method_t type) {
-	const uint8_t	*box = s_box + type * 256;
 	uint8_t			i;
 
 	for (i = 0; i < 4; ++i)
@@ -208,7 +207,6 @@ void		rot_word(uint32_t *word, uint8_t shift, method_t type) {
 void		shift_rows(uint8_t *block, method_t type) {
 	uint8_t		i;
 	uint32_t	*lines = (uint32_t *)block;
-	endian_t	endian = get_endian();
 
 	for (i = 0; i < 4; ++i)
 		rot_word(lines + i, i, type);
@@ -248,7 +246,7 @@ int			rand_key(uint8_t *buff, size_t size) {
 	int			fd = open("/dev/urandom", O_RDONLY);
 	size_t		i;
 
-	if (fd < 0 || read(fd, buff, size) < size) {
+	if (fd < 0 || read(fd, buff, size) < (ssize_t)size) {
 		close(fd);
 		return (-1);
 	}
@@ -390,7 +388,7 @@ int			encode_file(char *dst, char *src, uint8_t *key) {
 				buff[i] = 0;
 		data_sz = read_ret % 16 ? (read_ret / 16) * 16 + 16 : read_ret;
 		convert_data(buff, data_sz, r_keys, ENCODE);
-		if ((write_ret = write(fd_dst, buff, data_sz)) < data_sz)
+		if ((write_ret = write(fd_dst, buff, data_sz)) < 0 || (size_t)write_ret < data_sz)
 			return (close_and_ret(fd_src, fd_dst, "can't write to destination file"));
 	}
 	if (read_ret < 0 || (write_ret = write(fd_dst, &src_sz, 8)) < 8)
@@ -404,7 +402,6 @@ int			decode_file(char *dst, char *src, uint8_t *key) {
 	int			fd_dst, fd_src;	
 	uint8_t		buff[BUFF_SIZE];
 	ssize_t		read_ret, write_ret;
-	size_t		i;
 	uint64_t	src_sz, data_sz, write_sz;
 
 	get_rkeys(key, r_keys);
@@ -418,9 +415,9 @@ int			decode_file(char *dst, char *src, uint8_t *key) {
 		return (close_and_ret(fd_src, -1, "can't open destination file"));
 	for (; (read_ret = read(fd_src, buff, BUFF_SIZE)) > 0;
 		data_sz -= read_ret, src_sz -= read_ret) {
-		convert_data(buff, data_sz > read_ret ? read_ret : data_sz, r_keys, DECODE);
-		write_sz = src_sz > read_ret ? read_ret : src_sz;
-		if ((write_ret = write(fd_dst, buff, write_sz)) < write_sz)
+		convert_data(buff, data_sz > (size_t)read_ret ? read_ret : data_sz, r_keys, DECODE);
+		write_sz = src_sz > (size_t)read_ret ? read_ret : src_sz;
+		if ((write_ret = write(fd_dst, buff, write_sz)) < 0 || (size_t)write_ret < write_sz)
 			return (close_and_ret(fd_src, fd_dst, "can't write to destination file"));
 	}
 	if (read_ret < 0)
@@ -428,16 +425,47 @@ int			decode_file(char *dst, char *src, uint8_t *key) {
 	return (close_and_ret(fd_src, fd_dst, NULL));
 }
 
-int			main(void) {
+int			str_cmp(char *s1, char *s2) {
+	for (; *s2 && *s1 == *s2; ++s1, ++s2);
+	return (*s2);
+}
+
+int			get_key(char *arg, uint8_t *key) {
+	size_t		size = KEY_SIZE / 8;
+
+	for (; *arg != '='; ++arg);
+	++arg;
+	for (; *arg && size; ++key, ++arg, --size)
+		*key = *arg;
+	return (size || *arg ? -1 : 0);
+}
+
+int			main(int argc, char **argv) {
 	uint8_t		key[KEY_SIZE / 8 + 1] = { 0 };
 
-	if (rand_key(key, KEY_SIZE / 8) < 0) {
-		fprintf(stderr, "Error: can't generate random key\n");
-		return (-1);
+	if (argc != 4) {
+		printf("./a.out [-dec=KEY/-enc] SRC DST");
+		return (0);
 	}
-	encode_file("comp_enc.c", "encryption.c", key);
-	printf("key:%s\n", key);
-	decode_file("decomp_enc.c", "comp_enc.c", key);
+	if (!str_cmp(argv[1], "-enc")) {
+		if (rand_key(key, KEY_SIZE / 8) < 0) {
+			fprintf(stderr, "Error: can't generate random key\n");
+			return (1);
+		}
+		if (encode_file(argv[3], argv[2], key))
+			return (1);
+		printf("Key: %s\n", key);
+	} else if (!str_cmp(argv[1], "-dec=")) {
+		if (get_key(argv[1], key)) {
+			fprintf(stderr, "Error: misformatted key\n");
+			return (1);
+		}
+		printf("Key: %s\n", key);
+		if (decode_file(argv[3], argv[2], key))
+			return (1);
+	} else
+		fprintf(stderr, "./a.out [-dec=KEY/-enc] SRC DST");
+	return (0);
 }
 
 ////////////////////////////////////////////////////////////////
