@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 22:35:08 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/04 22:48:15 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,11 @@ static int		file_reader(int fd, uint8_t *byte) {
 int		value_writer(int fd, uint16_t value, size_t size, bool_t last_value) {
 	static uint16_t		buff = 0;
 	static int8_t		buff_len = 0;
+	static uint16_t		mask = 0;
 
-	buff |= value << (16 - size - buff_len);
+	if (!mask)
+		mask = ((uint16_t)~mask) >> (16 - size);
+	buff |= (value & mask) << (16 - size - buff_len);
 	buff_len += size;
 	while (buff_len >= 8 || (last_value && buff_len > 0)) {
 		if (file_writer(fd, buff >> 8, last_value && buff_len <= 8) < 0)
