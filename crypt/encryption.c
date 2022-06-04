@@ -6,14 +6,11 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/03 19:28:41 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/04 22:37:51 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include "../includes.h"
 
 #define KEY_SIZE		256		// 128 | 192 | 256
 #define RKEY_ARR_SIZE	60
