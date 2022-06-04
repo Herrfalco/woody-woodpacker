@@ -7,6 +7,8 @@ CFLAGS	=	-Wall -Wextra -Werror
 RM	=	rm -rf
 GARB	=	test_file
 
+test	:	all
+
 all	:	$(NAME)
 
 $(NAME)	:	$(OBJS)

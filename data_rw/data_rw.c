@@ -6,11 +6,10 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 22:48:15 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/04 23:31:25 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes.h"
 #include "data_rw.h"
 
 static int		file_writer(int fd, uint8_t byte, bool_t flush) {
