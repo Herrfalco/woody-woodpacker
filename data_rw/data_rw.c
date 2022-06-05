@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 23:31:25 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 15:20:52 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,34 +31,34 @@ static int		file_reader(int fd, uint8_t *byte) {
 	static ssize_t		buff_idx = 0;
 
 	if (buff_idx == buff_size) {
+		buff_idx = 0;
 		if ((buff_size = read(fd, buff, BUFF_SIZE)) < 1)
 			return (buff_size);
-		buff_idx = 0;
 	}
 	*byte = buff[buff_idx];
 	return (buff_size - (buff_idx++));
 }
 
 int		value_writer(int fd, uint16_t value, size_t size, bool_t last_value) {
-	static uint16_t		buff = 0;
-	static int8_t		buff_len = 0;
+	static uint32_t		buff = 0;
+	static uint8_t		buff_len = 0;
 	static uint16_t		mask = 0;
 
 	if (!mask)
 		mask = ((uint16_t)~mask) >> (16 - size);
-	buff |= (value & mask) << (16 - size - buff_len);
+	buff |= ((uint32_t)(value & mask)) << (32 - size - buff_len);
 	buff_len += size;
 	while (buff_len >= 8 || (last_value && buff_len > 0)) {
-		if (file_writer(fd, buff >> 8, last_value && buff_len <= 8) < 0)
+		if (file_writer(fd, buff >> 24, last_value && buff_len <= 8) < 0)
 			return (-1);
 		buff <<= 8;
-		buff_len -= 8;
+		buff_len = buff_len < 8 ? 0 : buff_len - 8;
 	}
-	return (buff_len < 0 ? 0 : buff_len);
+	return (buff_len);
 }
 
 int		value_reader(int fd, uint16_t *value, size_t size) {
-	static uint16_t		buff = 0;
+	static uint32_t		buff = 0;
 	static size_t		buff_size = 0;
 	static uint16_t		mask = 0;
 	int					read_ret;
@@ -66,14 +66,20 @@ int		value_reader(int fd, uint16_t *value, size_t size) {
 
 	if (!mask)
 		mask = ((uint16_t)~mask) >> (16 - size);
-	while (buff_size < size) {
-		if ((read_ret = file_reader(fd, &byte)) < 1)
-			return (read_ret);
+	while (buff_size <= 24 && (read_ret = file_reader(fd, &byte)) > 0) {
 		buff <<= 8;
 		buff |= byte;
 		buff_size += 8;
 	}
-	buff_size -= size;
-	*value = (buff >> buff_size) & mask;
-	return (1);
+	if (read_ret < 0)
+		return (read_ret);
+	if (buff_size >= size) {
+		buff_size -= size;
+		*value = (buff >> buff_size) & mask;
+		return (1);
+	} else {
+		buff = 0;
+		buff_size = 0;
+		return (0);
+	}
 }
