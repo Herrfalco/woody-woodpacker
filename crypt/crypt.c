@@ -6,91 +6,16 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 23:44:40 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:02:12 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes.h"
 #include "crypt.h"
+#include "crypt_steps.h"
+#include "crypt_utils.h"
 
-static endian_t		get_endian(void) {
-	uint16_t bytes = 1;
-
-	return (*((uint8_t*)&bytes) == 1 ? LITTLE : BIG);
-}
-
-static void			sub_word(uint8_t *word, method_t type) {
-	static const uint8_t	s_box[] = S_BOX;
-	const uint8_t			*box = s_box + type * 256;
-	uint8_t					i;
-
-	for (i = 0; i < 4; ++i)
-		word[i] = box[(word[i] >> 4) * 16 | (word[i] & 0xf)];
-}
-
-static void			sub_bytes(uint8_t *block, method_t type) {
-	uint8_t			i;
-
-	for (i = 0; i < 4; ++i)
-		sub_word(block + i * 4, type);
-}
-
-static void			rot_word(uint32_t *word, uint8_t shift, method_t type) {
-	static endian_t		endian = NO;
-
-	if (endian == NO)
-		endian = get_endian();
-	if ((endian == LITTLE && type == ENCODE)
-			|| (endian == BIG && type == DECODE))
-		*word = (*word >> shift * 8) | (*word << (4 - shift) * 8);
-	else
-		*word = (*word << shift * 8) | (*word >> (4 - shift) * 8);
-}
-
-static void			shift_rows(uint8_t *block, method_t type) {
-	uint8_t		i;
-	uint32_t	*lines = (uint32_t *)block;
-
-	for (i = 0; i < 4; ++i)
-		rot_word(lines + i, i, type);
-}
-
-static void			mix_columns(uint8_t *block, method_t type) {
-	static const uint8_t	mult_mat[] = MULT_MAT;
-	static const int8_t		mix_mat[] = {
-		0, 1, -1, -1, -1, 0, 1, -1, -1, -1, 0, 1, 1, -1, -1,
-		0, 5, 3, 4, 2, 2, 5, 3, 4, 4, 2, 5, 3, 3, 4, 2, 5 };
-	const int8_t			*mix = mix_mat + type * 16;
-	uint8_t					tmp[16] = { 0 };
-	uint8_t					x, y, i;
-
-	for (x = 0; x < 4; ++x) {
-		for (y = 0; y < 4; ++y) {
-			for (i = 0; i < 4; ++i) {
-				tmp[y * 4 + x] ^= mix[y * 4 + i] < 0
-					? block[i * 4 + x] : mult_mat[mix[y * 4 + i] * 256 + block[i * 4 + x]];
-			}
-		}
-	}
-	for (i = 0; i < 2; ++i)
-		((uint64_t *)block)[i] = ((uint64_t *)tmp)[i];
-}
-
-/*
-void		print_block(char *title, uint8_t *block) {
-	uint8_t		x, y;
-
-	printf("%s:\n", title);
-	for (y = 0; y < 4; ++y) {
-		for (x = 0; x < 4; ++x) {
-			printf("%02x ", block[y * 4 + x]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-}
-*/
-
-int					rand_key(uint8_t *buff, size_t size) {
+int				rand_key(uint8_t *buff, size_t size) {
 	int			fd = open("/dev/urandom", O_RDONLY);
 	size_t		i;
 
@@ -109,17 +34,6 @@ int					rand_key(uint8_t *buff, size_t size) {
 	}
 	close(fd);
 	return (0);
-}
-
-static uint8_t		get_rnb(void) {
-	switch (KEY_SIZE) {
-		case 128: 
-			return (11);
-		case 192:
-			return (13);
-		default:
-			return (15);
-	}
 }
 
 void				round_keys(uint8_t *key, uint32_t *rkeys) {
@@ -145,13 +59,6 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 		} else
 			rkeys[i] = rkeys[i - n] ^ rkeys[i - 1];
 	}
-}
-
-static void			add_rkeys(uint8_t *block, uint32_t *rkeys, uint8_t *rk_i) {
-	uint8_t				i;
-
-	for (i = 0; i < 4; ++i, ++(*rk_i))
-		((uint32_t *)block)[i] ^= rkeys[*rk_i];
 }
 
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {

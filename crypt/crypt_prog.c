@@ -6,10 +6,11 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 23:48:15 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:01:23 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes.h"
 #include "crypt.h"
 
 static int			close_and_ret(int fd1, int fd2, char *error) {
