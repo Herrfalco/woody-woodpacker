@@ -6,12 +6,18 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:48:44 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 15:58:51 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:09:23 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CRYPT_UTILS_H
 #define CRYPT_UTILS_H
+
+typedef enum		endian_e {
+	NO,
+	BIG,
+	LITTLE,
+}					endian_t;
 
 endian_t		get_endian(void);
 uint8_t			get_rnb(void);

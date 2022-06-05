@@ -1,25 +1,25 @@
 NAME	=	crypt_prog
 SRCS	=	crypt.c \
-			crypt_prog.c \
-			crypt_steps.c \
-			crypt_utils.c
+		crypt_prog.c \
+		crypt_steps.c \
+		crypt_utils.c
 OBJS	=	$(SRCS:.c=.o)
-CC		=	gcc
+CC	=	gcc
 CFLAGS	=	-Wall -Wextra -Werror
-RM		=	rm -rf
+RM	=	rm -rf
 
-all		:	$(NAME)
+all	:	$(NAME)
 
 $(NAME)	:	$(OBJS)
-			$(CC) $(CFLAGS) $^ -o $@
+		$(CC) $(CFLAGS) $^ -o $@
 
 %.o	:	%.c
-			$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) -c $< -o $@
 
 clean	:
-			$(RM) $(OBJS)
+		$(RM) $(OBJS)
 
 fclean	:	clean
-			$(RM) $(NAME)
+		$(RM) $(NAME)
 
-re		:	fclean all
+re	:	fclean all

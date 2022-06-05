@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:01:23 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:10:35 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,6 @@ int			main(int argc, char **argv) {
 			fprintf(stderr, "Error: misformatted key\n");
 			return (1);
 		}
-		printf("Key: %s\n", key);
 		if (decode_file(argv[3], argv[2], key))
 			return (1);
 	} else

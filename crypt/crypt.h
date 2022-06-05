@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:12:22 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:01:45 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:09:26 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,6 @@ typedef enum		method_e {
 	ENCODE = 0,
 	DECODE = 1,
 }					method_t;
-
-typedef enum		endian_e {
-	NO,
-	BIG,
-	LITTLE,
-}					endian_t;
 
 int		rand_key(uint8_t *buff, size_t size);
 void	round_keys(uint8_t *key, uint32_t *rkeys);

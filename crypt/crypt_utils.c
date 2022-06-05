@@ -6,12 +6,13 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:41:37 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:03:40 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:09:53 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "crypt.h"
+#include "crypt_utils.h"
 #include "crypt_tables.h"
 
 endian_t		get_endian(void) {
