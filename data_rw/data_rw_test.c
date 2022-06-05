@@ -6,10 +6,11 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 22:10:26 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 15:27:00 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/05 16:12:50 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes.h"
 #include "data_rw.h"
 
 static int		test(uint16_t *vals, size_t vals_nb, size_t vals_sz, char *name) {
