@@ -40,7 +40,6 @@ static void		lzw(int fd, int lzw_fd) {
 			last_byte = 256 + i;
 			continue ;
 		}
-		printf("%d\n", last_byte);
 		value_writer(lzw_fd, last_byte, 12, FALSE);
 		new_entry(last_byte, byte, &dico);
 		last_byte = byte;
