@@ -27,11 +27,9 @@ static int		check_dico(uint16_t last_byte, uint8_t byte, t_dico dico) {
 static void		lzw(int fd, int lzw_fd) {
 	uint8_t		byte;
 	uint16_t	last_byte;
-	t_dico		dico;
-	int			i;
+	t_dico		dico = { 0 };
+	int			i = -1;
 
-	i = -1;
-	bzero(&dico, sizeof(t_dico));
 	while (file_reader(fd, &byte) > 0) {
 		if (i < 0) {
 			last_byte = byte;
@@ -43,11 +41,11 @@ static void		lzw(int fd, int lzw_fd) {
 			continue ;
 		}
 		printf("%d\n", last_byte);
-		value_writer(1, last_byte, 12, FALSE);
+		value_writer(lzw_fd, last_byte, 12, FALSE);
 		new_entry(last_byte, byte, &dico);
 		last_byte = byte;
 	}
-	value_writer(lzw_fd, last_byte, 12, FALSE);
+	value_writer(lzw_fd, last_byte, 12, TRUE);
 }
 
 int				main(int ac, char **av) {
@@ -58,7 +56,7 @@ int				main(int ac, char **av) {
 		exit_error("USAGE: ./[exe] [file]", fd, lzw_fd);
 	if ((fd = open(av[1], O_RDONLY)) == -1)
 		exit_error("Error: Couldn't open file.", fd, lzw_fd);
-	if ((lzw_fd = open(strcat(av[1], ".lzw"), O_WRONLY | O_APPEND | O_CREAT, 0644)) == -1) 
+	if ((lzw_fd = open(strcat(av[1], ".lzw"), O_WRONLY | O_TRUNC | O_CREAT, 0644)) == -1) 
 		exit_error("Error: Couldn't create new file.", fd, lzw_fd);
 	lzw(fd, lzw_fd);
 	close(fd);
