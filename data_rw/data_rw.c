@@ -6,14 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:12:27 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/06 16:56:37 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "data_rw.h"
 
-static int		file_writer(int fd, uint8_t byte, bool_t flush) {
+int		file_writer(int fd, uint8_t byte, bool_t flush) {
 	static uint8_t		buff[BUFF_SIZE];
 	static ssize_t		buff_len = 0;
 	
@@ -26,7 +26,7 @@ static int		file_writer(int fd, uint8_t byte, bool_t flush) {
 	return (buff_len);
 }
 
-static int		file_reader(int fd, uint8_t *byte) {
+int		file_reader(int fd, uint8_t *byte) {
 	static uint8_t		buff[BUFF_SIZE];
 	static ssize_t		buff_size = 0;
 	static ssize_t		buff_idx = 0;
