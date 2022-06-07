@@ -6,16 +6,19 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 18:26:49 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/06 22:34:52 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/07 11:52:40 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ELF64_H
 #define ELF64_H
 
-#define MAGIC		".ELF"
-#define VERSION		1
-#define ABI			0
+#include "../includes.h"
+
+#define MAGIC			".ELF"
+#define MAGIC_SZ		4
+#define VERSION			1
+#define MAX_ADDRESS		0xffffffffffffffff
 
 typedef enum		bit_class_e {
 	OS_32 = 1,
@@ -62,15 +65,15 @@ typedef enum		sh_type_e {
 }					sh_type_t;
 
 typedef enum		perm_e {
-	EXEC = 1,
-	WRITE = 2,
-	READ = 4,
+	X = 1,
+	W = 2,
+	R = 4,
 }					perm_t;
 
 struct				seg_hdr_s {
 	uint32_t		type;				// NUL	| >LOAD<	| DYNAMIC	| INTERP
 										// NOTE	| SHLIB		| >PHDR<	| TLS
-	uint32_t		flags;				// EXEC	| WRITE	| READ
+	uint32_t		flags;				// X	| W		| R
 	uint64_t		offset;				// Content of the segment offset
 	uint64_t		vaddr;				// Address of the segment in memory
 	uint64_t		paddr;				// Used only if physical memory (0 ?)
@@ -91,22 +94,22 @@ struct				ident_s {
 	uint8_t			pad[7];				// zeros
 }					__attribute__((packed));
 
-typedef struct elf64_hdr_s		indent_t;
+typedef struct elf64_hdr_s		ident_t;
 
 struct				elf64_hdr_s {
-	ident_t			ident[EI_NIDENT];
+	struct ident_s	ident;
 	uint16_t		type;				// REL	| >EXEC<	| DYN	| CORE
 	uint16_t		machine;			// X86	| MIPS		| ARM	| >AMD64<	| ARMV8	| RISC_V
 	uint32_t		version;			// VERSION
 	uint64_t		entry;				// Entrypoint address
-	uint64_t		phoff;				// Program header table offset
-	uint64_t		shoff;				// Section header table offset
-	uint32_t		flags;				// ???
+	uint64_t		seg_hoff;			// Segment header table offset
+	uint64_t		sec_hoff;			// Section header table offset
+	uint32_t		flags;				// FLAGS
 	uint16_t		ehsize;				// sizeof(elf64_hdr_t)
-	uint16_t		phentsize;			// size of each entry in segment header table
-	uint16_t		phnum;				// nb of entry in segment header table
-	uint16_t		shentsize;			// size of each entry in section header table
-	uint16_t		shnum;				// nb of entry in section header table
+	uint16_t		seg_hentsize;		// size of each entry in segment header table
+	uint16_t		seg_hnum;			// nb of entry in segment header table
+	uint16_t		sec_hentsize;		// size of each entry in section header table
+	uint16_t		sec_hnum;			// nb of entry in section header table
 	uint16_t		shstrndx;			// Section header string table index
 }					__attribute__((packed));
 
