@@ -11,32 +11,40 @@ static void			exit_error(char *str, int fd, int new_fd) {
 	exit(1);
 }
 
-static void			new_entry(uint16_t last_byte, uint8_t byte, t_dico *dico) {
+void				print_dico(t_dico *dico) {
+	size_t		i;
+
+	for (i = 0; i < dico->size; ++i)
+		printf("%ld -> %d, %d\n", i, dico->entry[i][0], dico->entry[i][1]);
+}
+
+static void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
 	dico->entry[dico->size][0] = last_byte;
 	dico->entry[dico->size][1] = byte;
 	++dico->size;
+	print_dico(dico);
 }
 
-static int			check_dico(uint16_t last_value, uint16_t value, t_dico dico) {
+static int			check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 	size_t		i;
 
-	for (i = 0; i < dico.size; ++i)
-		if (last_value == dico.entry[i][0] && value == dico.entry[i][1])
+	for (i = 0; i < dico->size; ++i)
+		if (last_value == dico->entry[i][0] && value == dico->entry[i][1])
 			return (i + 1);
 	return (0);
 }
 
-static uint16_t		entry_writer(int fd, uint16_t value, t_dico dico) {
+static uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico) {
 	uint16_t	ret;
 
-	if (dico.entry[value - 256][0] > 255)
-		ret = entry_writer(fd, dico.entry[value - 256][0], dico);
+	if (dico->entry[value - 256][0] > 255)
+		ret = entry_writer(fd, dico->entry[value - 256][0], dico);
 	else {
-		file_writer(fd, dico.entry[value - 256][0], NO_FLUSH);
-		ret = dico.entry[value - 256][0];
+		file_writer(fd, dico->entry[value - 256][0], NO_FLUSH);
+		ret = dico->entry[value - 256][0];
 		printf("ret: %d\n", ret);
 	}
-	file_writer(fd, dico.entry[value - 256][1], NO_FLUSH);
+	file_writer(fd, dico->entry[value - 256][1], NO_FLUSH);
 	return (ret);
 }
 
@@ -49,7 +57,7 @@ static size_t		lzw_chunk(int fd, int new_fd) {
 	if (!file_reader(fd, (uint8_t *)&last_byte))
 		return (dico.size);
 	while (file_reader(fd, (uint8_t *)&byte)) {
-		if ((i = check_dico(last_byte, byte, dico)) > 0)
+		if ((i = check_dico(last_byte, byte, &dico)) > 0)
 			last_byte = 255 + i;
 		else {
 			value_writer(new_fd, last_byte, 12, NO_FLUSH);
@@ -75,7 +83,7 @@ static size_t	unlzw_chunk(int fd, int new_fd) {
 	file_writer(new_fd, last_value, NO_FLUSH);
 	for (; value_reader(fd, &value, 12); last_value = value) {
 		if (value > 255) {
-			first = entry_writer(new_fd, value, dico);	
+			first = entry_writer(new_fd, value, &dico);	
 			new_entry(last_value, first, &dico);
 		} else {
 			file_writer(new_fd, value, NO_FLUSH);
