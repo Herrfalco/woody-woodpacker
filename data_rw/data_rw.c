@@ -6,18 +6,19 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/06 16:56:37 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/07 15:15:49 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "data_rw.h"
 
-int		file_writer(int fd, uint8_t byte, bool_t flush) {
+int		file_writer(int fd, uint8_t byte, flush_t flush) {
 	static uint8_t		buff[BUFF_SIZE];
 	static ssize_t		buff_len = 0;
 	
-	buff[buff_len++] = byte;
+	if (flush != ONLY_FLUSH)
+		buff[buff_len++] = byte;
 	if (flush || buff_len == BUFF_SIZE) {
 		if (write(fd, buff, buff_len) != buff_len)
 			return (-1);
@@ -40,7 +41,7 @@ int		file_reader(int fd, uint8_t *byte) {
 	return (buff_size - (buff_idx++));
 }
 
-int		value_writer(int fd, uint16_t value, size_t size, bool_t last_value) {
+int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
 	static uint32_t		buff = 0;
 	static uint8_t		buff_len = 0;
 	static uint16_t		mask = 0;
@@ -49,8 +50,8 @@ int		value_writer(int fd, uint16_t value, size_t size, bool_t last_value) {
 		mask = ((uint16_t)~mask) >> (16 - size);
 	buff |= ((uint32_t)(value & mask)) << (32 - size - buff_len);
 	buff_len += size;
-	while (buff_len >= 8 || (last_value && buff_len > 0)) {
-		if (file_writer(fd, buff >> 24, last_value && buff_len <= 8) < 0)
+	while (buff_len >= 8 || (flush && buff_len > 0)) {
+		if (file_writer(fd, buff >> 24, buff_len <= 8 ? flush : NO_FLUSH) < 0)
 			return (-1);
 		buff <<= 8;
 		buff_len = buff_len < 8 ? 0 : buff_len - 8;

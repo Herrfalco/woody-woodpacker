@@ -14,93 +14,80 @@ static void			exit_error(char *str, int fd, int new_fd) {
 static void			new_entry(uint16_t last_byte, uint8_t byte, t_dico *dico) {
 	dico->entry[dico->size][0] = last_byte;
 	dico->entry[dico->size][1] = byte;
-	dico->size++;
+	++dico->size;
 }
 
 static int			check_dico(uint16_t last_value, uint16_t value, t_dico dico) {
-	for (size_t i = 0; i < dico.size; i++)
+	size_t		i;
+
+	for (i = 0; i < dico.size; ++i)
 		if (last_value == dico.entry[i][0] && value == dico.entry[i][1])
 			return (i + 1);
 	return (0);
 }
 
-static void			clear_dico(t_dico *dico) {
-	for (size_t i = 0; i < dico->size; i++) {
-		dico->entry[i][0] = 0;
-		dico->entry[i][1] = 0;
-	}
-	dico->size = 0;
-}
-
 static uint16_t		entry_writer(int fd, uint16_t value, t_dico dico) {
 	uint16_t	ret;
 
-	if (dico.entry[value - 257][0] > 256)
-		ret = entry_writer(fd, dico.entry[value - 257][0], dico);
+	if (dico.entry[value - 256][0] > 255)
+		ret = entry_writer(fd, dico.entry[value - 256][0], dico);
 	else {
-		write(fd, &dico.entry[value - 257][0], 1);
-		ret = dico.entry[value - 257][0];
+		file_writer(fd, dico.entry[value - 256][0], NO_FLUSH);
+		ret = dico.entry[value - 256][0];
 		printf("ret: %d\n", ret);
 	}
-	write(fd, &dico.entry[value - 257][1], 1);
+	file_writer(fd, dico.entry[value - 256][1], NO_FLUSH);
 	return (ret);
 }
 
-static void			lzw(int fd, int new_fd) {
-	uint8_t		byte;
-	uint16_t	last_byte;
+static size_t		lzw_chunk(int fd, int new_fd) {
 	t_dico		dico = { 0 };
-	int			i = -1;
+	uint16_t	byte, last_byte;
+	ssize_t		i;
 
-	while (file_reader(fd, &byte) > 0) {
-		if (dico.size == DICO_SIZE) {
-			clear_dico(&dico);
-			i = -1;
-		}
-		if (i < 0) {
+	last_byte = 0;
+	if (!file_reader(fd, (uint8_t *)&last_byte))
+		return (dico.size);
+	while (file_reader(fd, (uint8_t *)&byte)) {
+		if ((i = check_dico(last_byte, byte, dico)) > 0)
+			last_byte = 255 + i;
+		else {
+			value_writer(new_fd, last_byte, 12, NO_FLUSH);
+			new_entry(last_byte, byte, &dico);
 			last_byte = byte;
-			i++;
-			continue;
 		}
-		if ((i = check_dico(last_byte, (uint16_t)byte, dico)) > 0) {
-			last_byte = 256 + i;
-			continue ;
-		}
-		value_writer(new_fd, last_byte, 12, FALSE);
-		new_entry(last_byte, byte, &dico);
-		last_byte = byte;
 	}
-	value_writer(new_fd, last_byte, 12, TRUE);
+	value_writer(new_fd, last_byte, 12, NO_FLUSH);
+	return (dico.size);
+}
+
+static void			lzw(int fd, int new_fd) {
+	while (lzw_chunk(fd, new_fd) == DICO_SIZE);
+	value_writer(new_fd, 0, 12, ONLY_FLUSH);
+}
+
+static size_t	unlzw_chunk(int fd, int new_fd) {
+	t_dico		dico = { 0 };
+	uint16_t	value, last_value, first;
+
+	if (!value_reader(fd, &last_value, 12))
+		return (dico.size);
+	file_writer(new_fd, last_value, NO_FLUSH);
+	for (; value_reader(fd, &value, 12); last_value = value) {
+		if (value > 255) {
+			first = entry_writer(new_fd, value, dico);	
+			new_entry(last_value, first, &dico);
+		} else {
+			file_writer(new_fd, value, NO_FLUSH);
+			new_entry(last_value, value, &dico);
+		}
+	}
+	return (dico.size);
 }
 
 static void		unlzw(int fd, int new_fd) {
-	uint16_t	value, last_value, first;
-	t_dico		dico = { 0 };
-	size_t		i = 0;
-
-	while (value_reader(fd, &value, 12) > 0) {
-		if (dico.size == DICO_SIZE) {
-			clear_dico(&dico);
-			i = 0;
-		}
-		if (dico.size == 0) {
-			dico.entry[0][i] = value;
-			write(new_fd, &value, 1);
-			i == 0 ? i++ : dico.size++;
-			last_value = value;
-			continue ;
-		}
-		if (value > 256) {
-			first = entry_writer(new_fd, value, dico);
-			new_entry(last_value, first, &dico);
-			last_value = value;
-		}
-		else {
-			write(new_fd, &value, 1);
-			new_entry(last_value, value, &dico);
-			last_value = value;
-		}
-	}
+	while (unlzw_chunk(fd, new_fd) == DICO_SIZE);
+	file_writer(new_fd, 0, ONLY_FLUSH);
 }
 
 int				main(int ac, char **av) {
@@ -115,8 +102,7 @@ int				main(int ac, char **av) {
 		if ((new_fd = open(strcat(av[2], ".lzw"), O_WRONLY | O_TRUNC | O_CREAT, 0644)) == -1) 
 			exit_error("Error: Couldn't create new file.", fd, new_fd);
 		lzw(fd, new_fd);
-	}
-	else {
+	} else {
 		if ((new_fd = open(strcat(av[2], ".unlzw"), O_WRONLY | O_TRUNC | O_CREAT, 0644)) == -1)
 			exit_error("Error: Couldn't create new file.", fd, new_fd);
 		unlzw(fd, new_fd);
