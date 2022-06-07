@@ -2,7 +2,7 @@
 #include "lzw.h"
 #include "../data_rw/data_rw.h"
 
-static void		exit_error(char *str, int fd, int new_fd) {
+static void			exit_error(char *str, int fd, int new_fd) {
 	write(2, str, strlen(str));
 	if (fd)
 		close(fd);
@@ -11,39 +11,52 @@ static void		exit_error(char *str, int fd, int new_fd) {
 	exit(1);
 }
 
-static void		new_entry(uint16_t last_byte, uint8_t byte, t_dico *dico) {
+static void			new_entry(uint16_t last_byte, uint8_t byte, t_dico *dico) {
 	dico->entry[dico->size][0] = last_byte;
 	dico->entry[dico->size][1] = byte;
 	dico->size++;
 }
 
-static int		check_dico(uint16_t last_value, uint16_t value, t_dico dico) {
+static int			check_dico(uint16_t last_value, uint16_t value, t_dico dico) {
 	for (size_t i = 0; i < dico.size; i++)
 		if (last_value == dico.entry[i][0] && value == dico.entry[i][1])
 			return (i + 1);
 	return (0);
 }
 
-static uint16_t		entry_writer(int fd, uint16_t value, t_dico dico, bool_t last_value) {
+static void			clear_dico(t_dico *dico) {
+	for (size_t i = 0; i < dico->size; i++) {
+		dico->entry[i][0] = 0;
+		dico->entry[i][1] = 0;
+	}
+	dico->size = 0;
+}
+
+static uint16_t		entry_writer(int fd, uint16_t value, t_dico dico) {
 	uint16_t	ret;
 
 	if (dico.entry[value - 257][0] > 256)
-		entry_writer(fd, dico.entry[value - 257][0], dico, FALSE);
+		ret = entry_writer(fd, dico.entry[value - 257][0], dico);
 	else {
-		value_writer(fd, dico.entry[value - 257][0], 8, FALSE);
+		write(fd, &dico.entry[value - 257][0], 1);
 		ret = dico.entry[value - 257][0];
+		printf("ret: %d\n", ret);
 	}
-	value_writer(fd, dico.entry[value - 257][1], 8, last_value);
+	write(fd, &dico.entry[value - 257][1], 1);
 	return (ret);
 }
 
-static void		lzw(int fd, int new_fd) {
+static void			lzw(int fd, int new_fd) {
 	uint8_t		byte;
 	uint16_t	last_byte;
 	t_dico		dico = { 0 };
 	int			i = -1;
 
 	while (file_reader(fd, &byte) > 0) {
+		if (dico.size == DICO_SIZE) {
+			clear_dico(&dico);
+			i = -1;
+		}
 		if (i < 0) {
 			last_byte = byte;
 			i++;
@@ -66,25 +79,28 @@ static void		unlzw(int fd, int new_fd) {
 	size_t		i = 0;
 
 	while (value_reader(fd, &value, 12) > 0) {
+		if (dico.size == DICO_SIZE) {
+			clear_dico(&dico);
+			i = 0;
+		}
 		if (dico.size == 0) {
 			dico.entry[0][i] = value;
-			value_writer(new_fd, value, 8, FALSE);
+			write(new_fd, &value, 1);
 			i == 0 ? i++ : dico.size++;
 			last_value = value;
 			continue ;
 		}
 		if (value > 256) {
-			first = entry_writer(new_fd, value, dico, FALSE);
+			first = entry_writer(new_fd, value, dico);
 			new_entry(last_value, first, &dico);
 			last_value = value;
 		}
 		else {
-			value_writer(new_fd, value, 8, FALSE);
+			write(new_fd, &value, 1);
 			new_entry(last_value, value, &dico);
 			last_value = value;
 		}
 	}
-	value_writer(new_fd, (uint16_t)'\0', 8, TRUE);
 }
 
 int				main(int ac, char **av) {

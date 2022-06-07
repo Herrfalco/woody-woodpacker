@@ -5,7 +5,6 @@ OBJS	=	$(SRCS:.c=.o)
 CC	=	gcc
 CFLAGS	=	-Wall -Wextra -Werror
 RM	=	rm -rf
-GARB	=	test_file
 
 test	:	all
 
@@ -18,7 +17,7 @@ $(NAME)	:	$(OBJS)
 		$(CC) $(CFLAGS) -c $< -o $@
 
 clean	:
-		$(RM) $(OBJS) $(GARB)
+		$(RM) $(OBJS)
 
 fclean	:	clean
 		$(RM) $(NAME)

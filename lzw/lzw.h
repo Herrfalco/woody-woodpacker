@@ -1,7 +1,7 @@
 #ifndef COMPR_H
 # define COMPR_H
 
-# define DICO_SIZE 4096
+# define DICO_SIZE 4095
 
 typedef struct	s_dico {
 	size_t		size;
