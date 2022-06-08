@@ -11,13 +11,6 @@ static void			exit_error(char *str, int fd, int new_fd) {
 	exit(1);
 }
 
-void				print_dico(t_dico *dico) {
-	size_t		i;
-
-	for (i = 0; i < dico->size; ++i)
-		printf("%ld -> %d, %d\n", 256 + i, dico->entry[i][0], dico->entry[i][1]);
-}
-
 static void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
 	size_t	i;
 
