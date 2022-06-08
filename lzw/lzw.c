@@ -87,7 +87,7 @@ static size_t		lzw_chunk(int fd, int new_fd) {
 }
 
 static void			lzw(int fd, int new_fd) {
-	while (lzw_chunk(fd, new_fd) == DICO_SIZE - 4);
+	while (lzw_chunk(fd, new_fd) == DICO_SIZE);
 	value_writer(new_fd, 0, 12, ONLY_FLUSH);
 }
 
