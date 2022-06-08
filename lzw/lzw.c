@@ -73,7 +73,7 @@ static size_t		lzw_chunk(int fd, int new_fd) {
 	last_byte = 0;
 	if (!file_reader(fd, (uint8_t *)&last_byte))
 		return (dico.size);
-	while (file_reader(fd, (uint8_t *)&byte)) {
+	while (file_reader(fd, (uint8_t *)&byte) && dico.size < DICO_SIZE) {
 		if ((i = check_dico(last_byte, byte, &dico)) > 0)
 			last_byte = 255 + i;
 		else {
@@ -87,7 +87,7 @@ static size_t		lzw_chunk(int fd, int new_fd) {
 }
 
 static void			lzw(int fd, int new_fd) {
-	while (lzw_chunk(fd, new_fd) == DICO_SIZE);
+	while (lzw_chunk(fd, new_fd) == DICO_SIZE - 4);
 	value_writer(new_fd, 0, 12, ONLY_FLUSH);
 }
 
@@ -98,7 +98,7 @@ static size_t	unlzw_chunk(int fd, int new_fd) {
 	if (!value_reader(fd, &last_value, 12))
 		return (dico.size);
 	file_writer(new_fd, last_value, NO_FLUSH);
-	for (; value_reader(fd, &value, 12); last_value = value) {
+	for (; value_reader(fd, &value, 12) && dico.size < DICO_SIZE; last_value = value) {
 		if (value > 255) {
 			if (value > dico.size + 255)
 				not_in_dico(last_value, &dico);
@@ -113,7 +113,7 @@ static size_t	unlzw_chunk(int fd, int new_fd) {
 }
 
 static void		unlzw(int fd, int new_fd) {
-	while (unlzw_chunk(fd, new_fd) == DICO_SIZE);
+	while (unlzw_chunk(fd, new_fd) >= DICO_SIZE);
 	file_writer(new_fd, 0, ONLY_FLUSH);
 }
 

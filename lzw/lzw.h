@@ -5,7 +5,7 @@
 
 typedef struct	s_dico {
 	size_t		size;
-	uint16_t	entry[DICO_SIZE][2];
+	uint16_t	entry[DICO_SIZE + 1][2];
 }				t_dico;
 
 #endif
