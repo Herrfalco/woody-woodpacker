@@ -2,6 +2,7 @@
 # define COMPR_H
 
 # define DICO_SIZE 4095
+# define BUFF_SIZE 1024
 
 typedef struct	s_dico {
 	size_t		size;
