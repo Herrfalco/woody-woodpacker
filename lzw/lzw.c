@@ -15,18 +15,22 @@ void				print_dico(t_dico *dico) {
 	size_t		i;
 
 	for (i = 0; i < dico->size; ++i)
-		printf("%ld -> %d, %d\n", i, dico->entry[i][0], dico->entry[i][1]);
+		printf("%ld -> %d, %d\n", 256 + i, dico->entry[i][0], dico->entry[i][1]);
 }
 
 static void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
+	size_t	i;
+
+	for (i = 0; i < dico->size; ++i)
+		if (dico->entry[i][0] == last_byte && dico->entry[i][1] == byte)
+			return ;
 	dico->entry[dico->size][0] = last_byte;
 	dico->entry[dico->size][1] = byte;
 	++dico->size;
-	print_dico(dico);
 }
 
 static int			check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
-	size_t		i;
+	size_t	i;
 
 	for (i = 0; i < dico->size; ++i)
 		if (last_value == dico->entry[i][0] && value == dico->entry[i][1])
@@ -42,10 +46,23 @@ static uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico) {
 	else {
 		file_writer(fd, dico->entry[value - 256][0], NO_FLUSH);
 		ret = dico->entry[value - 256][0];
-		printf("ret: %d\n", ret);
 	}
 	file_writer(fd, dico->entry[value - 256][1], NO_FLUSH);
 	return (ret);
+}
+
+static uint16_t		find_first_pattern(uint16_t value, t_dico *dico) {
+	if (dico->entry[value - 256][0] > 255)
+		return (find_first_pattern(dico->entry[value - 256][0], dico));
+	else 
+		return (dico->entry[value - 256][0]);
+}
+
+static void			not_in_dico(uint16_t last_value, t_dico *dico) {
+	if (last_value <= 255)
+		new_entry(last_value, last_value, dico);
+	else
+		new_entry(last_value, find_first_pattern(last_value, dico), dico);
 }
 
 static size_t		lzw_chunk(int fd, int new_fd) {
@@ -83,7 +100,9 @@ static size_t	unlzw_chunk(int fd, int new_fd) {
 	file_writer(new_fd, last_value, NO_FLUSH);
 	for (; value_reader(fd, &value, 12); last_value = value) {
 		if (value > 255) {
-			first = entry_writer(new_fd, value, &dico);	
+			if (value > dico.size + 255)
+				not_in_dico(last_value, &dico);
+			first = entry_writer(new_fd, value, &dico);
 			new_entry(last_value, first, &dico);
 		} else {
 			file_writer(new_fd, value, NO_FLUSH);
