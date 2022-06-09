@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:02:12 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/08 12:56:05 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ static void			decode_block(uint8_t *block, uint32_t *rkeys) {
 	}
 }
 
- int				convert_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
+int					convert_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
 	uint64_t	i;
 
 	if (size % 16) {
