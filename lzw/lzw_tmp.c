@@ -86,7 +86,7 @@ static void			lzw(int fd, uint8_t	**data) {
 	value_writer(data, pos + 1, 12, ONLY_FLUSH);
 }
 
-static size_t	unlzw_chunk(uint8_t **data, int new_fd, size_t *pos, uint64_t size) {
+static size_t		unlzw_chunk(uint8_t **data, int new_fd, size_t *pos, uint64_t size) {
 	t_dico		dico = { 0 };
 	uint16_t	value, last_value, first;
 
@@ -107,14 +107,14 @@ static size_t	unlzw_chunk(uint8_t **data, int new_fd, size_t *pos, uint64_t size
 	return (dico.size);
 }
 
-static void		unlzw(uint8_t **data, uint64_t size, int new_fd) {
+static void			unlzw(uint8_t **data, uint64_t size, int new_fd) {
 	size_t	pos = 0;
 
 	while (unlzw_chunk(data, new_fd, &pos) >= DICO_SIZE);
 	file_writer(new_fd, pos + 1, ONLY_FLUSH);
 }
 
-int				main(int ac, char **av) {
+int					main(int ac, char **av) {
 	int	fd = 0;
 	int	new_fd = 0;
 
