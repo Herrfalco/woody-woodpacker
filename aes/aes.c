@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   crypt.c                                            :+:      :+:    :+:   */
+/*   aes.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/08 12:56:05 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/09 13:00:54 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
-#include "crypt.h"
-#include "crypt_steps.h"
-#include "crypt_utils.h"
+#include "aes.h"
+#include "aes_steps.h"
+#include "aes_utils.h"
 
 int				rand_key(uint8_t *buff, size_t size) {
 	int			fd = open("/dev/urandom", O_RDONLY);
@@ -94,18 +94,13 @@ static void			decode_block(uint8_t *block, uint32_t *rkeys) {
 	}
 }
 
-int					convert_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
+void				aes_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
 	uint64_t	i;
 
-	if (size % 16) {
-		fprintf(stderr, "Error: encode_data(data, size) -> data size must be divisible by 16\n");
-		return (-1);
-	}
 	if (type == ENCODE)
 		for (i = 0; i < size; i += 16)
 			encode_block(data + i, r_keys);
 	else
 		for (i = 0; i < size; i += 16)
 			decode_block(data + i, r_keys);
-	return (0);
 }

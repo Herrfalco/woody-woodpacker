@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   crypt_utils.c                                      :+:      :+:    :+:   */
+/*   aes_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:41:37 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/05 16:09:53 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/09 13:06:08 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
-#include "crypt.h"
-#include "crypt_utils.h"
-#include "crypt_tables.h"
+#include "aes.h"
+#include "aes_utils.h"
+#include "aes_tables.h"
 
 endian_t		get_endian(void) {
 	uint16_t bytes = 1;

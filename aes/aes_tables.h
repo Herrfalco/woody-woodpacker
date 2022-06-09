@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   crypt_tables.h                                     :+:      :+:    :+:   */
+/*   aes_tables.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:06:53 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/04 23:07:45 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/09 13:05:27 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CRYPT_TABLES_H
-#define CRYPT_TABLES_H
+#ifndef AES_TABLES_H
+#define AES_TABLES_H
 
 #define S_BOX		"\x63\x7c\x77\x7b\xf2\x6b\x6f\xc5\x30\x01\x67\x2b\xfe\xd7\xab\x76" \
 					"\xca\x82\xc9\x7d\xfa\x59\x47\xf0\xad\xd4\xa2\xaf\x9c\xa4\x72\xc0" \
@@ -143,4 +143,4 @@
 					"\x37\x39\x2b\x25\x0f\x01\x13\x1d\x47\x49\x5b\x55\x7f\x71\x63\x6d" \
 					"\xd7\xd9\xcb\xc5\xef\xe1\xf3\xfd\xa7\xa9\xbb\xb5\x9f\x91\x83\x8d"
 
-#endif // CRYPT_TABLES_H
+#endif // AES_TABLES_H
