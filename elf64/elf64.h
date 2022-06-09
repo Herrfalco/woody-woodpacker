@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 18:26:49 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/07 11:52:40 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/08 11:37:53 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,11 @@
 
 #include "../includes.h"
 
-#define MAGIC			".ELF"
+#define MAGIC			"\x7f" "ELF"
 #define MAGIC_SZ		4
 #define VERSION			1
-#define MAX_ADDRESS		0xffffffffffffffff
+#define BASE_ADDR		0x400000
+#define PAGE_SZ			0x1000
 
 typedef enum		bit_class_e {
 	OS_32 = 1,
@@ -40,7 +41,7 @@ typedef enum		os_e {
 typedef enum		eh_type_e {
 	REL	= 1,		
 	EXEC = 2,		//		Needed for an executable without ALSR (no PIE)
-	DYN = 3,		//		Shared library of executable with PIE
+	DYN = 3,
 	CORE = 4,
 }					eh_type_t;
 
@@ -60,7 +61,7 @@ typedef enum		sh_type_e {
 	INTERP,
 	NOTE,
 	SHLIB,
-	PHDR,			//		This segment specifies where segment header table will be loaded
+	PHDR,
 	TLS,
 }					sh_type_t;
 
@@ -72,7 +73,7 @@ typedef enum		perm_e {
 
 struct				seg_hdr_s {
 	uint32_t		type;				// NUL	| >LOAD<	| DYNAMIC	| INTERP
-										// NOTE	| SHLIB		| >PHDR<	| TLS
+										// NOTE	| SHLIB		| PHDR		| TLS
 	uint32_t		flags;				// X	| W		| R
 	uint64_t		offset;				// Content of the segment offset
 	uint64_t		vaddr;				// Address of the segment in memory
@@ -106,7 +107,7 @@ struct				elf64_hdr_s {
 	uint64_t		sec_hoff;			// Section header table offset
 	uint32_t		flags;				// FLAGS
 	uint16_t		ehsize;				// sizeof(elf64_hdr_t)
-	uint16_t		seg_hentsize;		// size of each entry in segment header table
+	uint16_t		seg_hentsize;		// sizeof(seg_hdr_t)
 	uint16_t		seg_hnum;			// nb of entry in segment header table
 	uint16_t		sec_hentsize;		// size of each entry in section header table
 	uint16_t		sec_hnum;			// nb of entry in section header table
