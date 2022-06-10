@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/10 15:31:44 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/10 16:32:06 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,8 @@ int				diff_v_files(int f1, int f2) {
 
 	size_1 = get_fd_size(f1);
 	size_2 = get_fd_size(f2);
-	if (size_1 != size_2) {
-		printf("diff size\n");
+	if (size_1 != size_2)
 		return (1);
-	}
 	for (; size_1 && (rd_ret_1 = read(f1, buff_1, BUFF_SIZE)) > 0
 				&& (rd_ret_2 = read(f2, buff_2, BUFF_SIZE)) > 0;
 				size_1 = sat_sub(size_1, rd_ret_1)) {
