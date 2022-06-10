@@ -1,9 +1,17 @@
-NAME	=	lzw
+NAME	=	lzw_test
 SRCS	=	lzw.c \
-		../data_rw/data_rw.c
+			unlzw.c \
+			dico.c \
+			main_test.c \
+			../utils.c \
+			../data_rw/data_rw.c
+
 OBJS	=	$(SRCS:.c=.o)
+
 CC	=	gcc
+
 CFLAGS	=	-Wall -Wextra -Werror
+
 RM	=	rm -rf
 
 test	:	all
