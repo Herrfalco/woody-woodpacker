@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/10 15:11:30 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/10 16:12:53 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,7 @@ static void			encode_fd(int fd_dst, int fd_src, uint32_t *r_keys) {
 	if ((write_ret = write(fd_dst, &src_sz, 8)) < 8)
 		quit_2_fd(fd_src, fd_dst, "can't write to destination file");
 	for (; src_sz && (read_ret = read(fd_src, buff, BUFF_SIZE)) > 0;
-		src_sz = sat_sub(src_sz, read_ret)) {
-		if (read_ret < BUFF_SIZE && src_sz >= BUFF_SIZE)
-			quit_2_fd(fd_src, fd_dst, "can't read from source file");
+			src_sz = sat_sub(src_sz, BUFF_SIZE)) {
 		for (i = src_sz; i < BUFF_SIZE; ++i)
 			buff[i] = 0;
 		data_sz = src_sz < BUFF_SIZE ? round_up(src_sz, 16) : BUFF_SIZE;
@@ -48,9 +46,7 @@ static void			decode_fd(int fd_dst, int fd_src, uint32_t *r_keys) {
 	if ((read_ret = read(fd_src, &src_sz, 8)) < 8)
 		quit_2_fd(fd_src, fd_dst, "can't read from source file");
 	for (; src_sz && (read_ret = read(fd_src, buff, BUFF_SIZE)) > 0;
-		src_sz = sat_sub(src_sz, read_ret)) {
-		if (read_ret < BUFF_SIZE && src_sz >= BUFF_SIZE)
-			quit_2_fd(fd_src, fd_dst, "can't read from source file");
+			src_sz = sat_sub(src_sz, BUFF_SIZE)) {
 		write_sz = src_sz > BUFF_SIZE ? BUFF_SIZE : src_sz;
 		aes_data(buff, round_up(write_sz, 16), r_keys, DECODE);
 		if ((write_ret = write(fd_dst, buff, write_sz)) < 0 || (size_t)write_ret < write_sz)
