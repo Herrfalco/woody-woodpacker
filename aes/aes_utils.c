@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:41:37 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/09 13:06:08 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/10 15:35:10 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #include "aes.h"
 #include "aes_utils.h"
 #include "aes_tables.h"
+
+uint64_t		round_up(uint64_t val, uint64_t mod) {
+	return (val % mod ? (val / mod) * mod + mod : val);
+}
 
 endian_t		get_endian(void) {
 	uint16_t bytes = 1;
