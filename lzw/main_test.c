@@ -17,7 +17,7 @@ int		main(int ac, char **av) {
 	int	new_fd = 0;
 
 	if (ac != 2)
-		quit("2 args needed.");
+		quit("1 arg needed.");
 	if ((fd = open(av[1], O_RDONLY)) == -1)
 		quit("Can not open entry file.");
 	new_fd = lzw(fd);

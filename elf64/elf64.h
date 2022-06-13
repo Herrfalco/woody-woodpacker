@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 18:26:49 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/08 11:37:53 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/13 13:59:41 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@
 #define VERSION			1
 #define BASE_ADDR		0x400000
 #define PAGE_SZ			0x1000
+
+typedef enum		offsets_e {
+	SEG_TAB = 32,
+	SEG_NB = 56,
+}					offsets_t;
 
 typedef enum		bit_class_e {
 	OS_32 = 1,
