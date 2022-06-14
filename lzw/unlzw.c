@@ -12,7 +12,7 @@ static size_t	unlzw_chunk(int fd, int new_fd) {
 	for (; value_reader(fd, &value, 12) > 0; last_value = value) {
 		if (value > 255) {
 			if (value == 256)
-				return (dico.size);
+				return (DICO_SIZE);
 			else if (value == 257)
 				return (0);
 			if (value > dico.size + 257)
