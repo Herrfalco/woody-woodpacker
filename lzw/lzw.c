@@ -22,8 +22,10 @@ static size_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz) {
 		}
 	}
 	value_writer(new_fd, last_byte, 12, NO_FLUSH);
-	if (dico.size == DICO_SIZE)
+	if (dico.size == DICO_SIZE) {
 		value_writer(new_fd, 256, 12, NO_FLUSH);
+		value_writer(new_fd, byte, 12, NO_FLUSH);
+	}
 	return (dico.size);
 }
 

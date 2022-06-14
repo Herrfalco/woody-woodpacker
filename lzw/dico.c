@@ -2,6 +2,17 @@
 #include "lzw.h"
 #include "../data_rw/data_rw.h"
 
+size_t			get_bits_nb(size_t dico_size) {
+	if (dico_size < 511)
+		return (9);
+	else if (dico_size < 1023)
+		return (10);
+	else if (dico_size < 2048)
+		return (11);
+	else
+		return (12);
+}
+
 void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
 	size_t	i;
 
