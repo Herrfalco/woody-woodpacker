@@ -15,14 +15,14 @@ static size_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 		file_writer(new_fd, last_value, NO_FLUSH);
 	}
 	for (; value_reader(fd, &value, 12) > 0; last_value = value) {
-		if (value > 255) {
-			if (value == 256) {
+		if (value > MAX_BYTE) {
+			if (value == RESET_CODE) {
 				*reset = 1;
 				return (DICO_SIZE);
 			}
-			else if (value == 257)
+			else if (value == STOP_CODE)
 				return (0);
-			if (value > dico.size + 257)
+			if (value > dico.size + 258)
 				not_in_dico(last_value, &dico);
 			first = entry_writer(new_fd, value, &dico);
 			new_entry(last_value, first, &dico);

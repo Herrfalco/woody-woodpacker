@@ -36,25 +36,25 @@ int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico) {
 	uint16_t	ret;
 
-	if (dico->entry[value - 258][0] > 257)
-		ret = entry_writer(fd, dico->entry[value - 258][0], dico);
+	if (dico->entry[value - DICO_START][0] >= DICO_START)
+		ret = entry_writer(fd, dico->entry[value - DICO_START][0], dico);
 	else {
-		file_writer(fd, dico->entry[value - 258][0], NO_FLUSH);
-		ret = dico->entry[value - 258][0];
+		file_writer(fd, dico->entry[value - DICO_START][0], NO_FLUSH);
+		ret = dico->entry[value - DICO_START][0];
 	}
-	file_writer(fd, dico->entry[value - 258][1], NO_FLUSH);
+	file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH);
 	return (ret);
 }
 
 static uint16_t		find_first_pattern(uint16_t value, t_dico *dico) {
-	if (dico->entry[value - 258][0] > 257)
-		return (find_first_pattern(dico->entry[value - 258][0], dico));
+	if (dico->entry[value - DICO_START][0] >= DICO_START)
+		return (find_first_pattern(dico->entry[value - DICO_START][0], dico));
 	else 
-		return (dico->entry[value - 258][0]);
+		return (dico->entry[value - DICO_START][0]);
 }
 
 void			not_in_dico(uint16_t last_value, t_dico *dico) {
-	if (last_value <= 255)
+	if (last_value <= MAX_BYTE)
 		new_entry(last_value, last_value, dico);
 	else
 		new_entry(last_value, find_first_pattern(last_value, dico), dico);
