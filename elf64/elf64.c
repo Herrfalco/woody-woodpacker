@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/13 14:25:05 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/13 16:49:33 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,23 +65,19 @@ void	write_hdr(int fd, uint64_t entry, uint16_t seg_nb) {
 }
 
 uint16_t	cpy_segs(int input, int output) {
-	uint16_t	seg_nb, i;
+	uint16_t	seg_nb, i, last_vaddr;
 	uint64_t	seg_tab, filesz;
 	uint8_t		buff[BUFF_SIZE];
-	seg_hdr_t	seg_hdr;
-	seg_hdr_t	last_offset = { 0 };
-	seg_hdr_t	last_vaddr = { 0 };
+	seg_hdr_t	seg_hdr, last_vaddr;
 
 	lseek(input, SEG_NB, SEEK_SET);
 	read(input, &seg_nb, sizeof(uint16_t));
 	lseek(input, SEG_TAB, SEEK_SET);
 	read(input, &seg_tab, sizeof(uint64_t));
 	lseek(output, sizeof(elf64_hdr_t), SEEK_SET);
-	for (i = 0; i < seg_nb; ++i) {
+	for (i = 0, last_vaddr = 0; i < seg_nb; ++i) {
 		lseek(input, seg_tab + i * sizeof(seg_hdr_t), SEEK_SET);
 		read(input, &seg_hdr, sizeof(seg_hdr_t));	
-		if (seg_hdr.offset > last_offset.offset)
-			last_offset = seg_hdr;
 		if (seg_hdr.vaddr > last_offset.vaddr)
 			last_vaddr = seg_hdr;
 		filesz = seg_hdr.filesz;

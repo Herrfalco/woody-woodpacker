@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:48:44 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/10 14:50:32 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/15 13:43:34 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,5 @@ uint64_t		round_up(uint64_t val, uint64_t mod);
 endian_t		get_endian(void);
 uint8_t			get_rnb(void);
 void			rot_word(uint32_t *word, uint8_t shift, method_t type);
-void			sub_word(uint8_t *word, method_t type);
 
 #endif // AES_UTILS_H

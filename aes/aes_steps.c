@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:40:47 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/09 13:04:06 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/15 15:40:04 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,6 @@
 #include "aes_steps.h"
 #include "aes_utils.h"
 #include "aes_tables.h"
-
-//////////////////// SUB_BYTES ////////////////////////
-
-void				sub_bytes(uint8_t *block, method_t type) {
-	uint8_t			i;
-
-	for (i = 0; i < 4; ++i)
-		sub_word(block + i * 4, type);
-}
 
 //////////////////// SHIFT_ROWS ////////////////////////
 
@@ -60,9 +51,10 @@ void				mix_columns(uint8_t *block, method_t type) {
 
 //////////////////// ADD_ROUND_KEYS ////////////////////////
 
-void			add_rkeys(uint8_t *block, uint32_t *rkeys, uint8_t *rk_i) {
+void			add_rkeys(uint8_t *block, uint32_t *rkeys, uint8_t round) {
 	uint8_t				i;
+	uint8_t				rk_i = round * 4;
 
-	for (i = 0; i < 4; ++i, ++(*rk_i))
-		((uint32_t *)block)[i] ^= rkeys[*rk_i];
+	for (i = 0; i < 4; ++i, ++rk_i)
+		((uint32_t *)block)[i] ^= rkeys[rk_i];
 }

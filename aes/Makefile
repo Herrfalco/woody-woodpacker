@@ -6,15 +6,18 @@ SRCS	=	aes.c \
 			aes_utils.c \
 			../test_utils.c \
 			../utils.c
+ASM		=	asm/aes_decode_bloc.o \
+			asm/aes_sub_bytes.o
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
-CFLAGS	=	-Wall -Wextra -Werror
+CFLAGS	=	-Wall -Wextra -Werror -no-pie
 RM		=	rm -rf
 
 all		:	$(NAME)
 
 $(NAME)	:	$(OBJS)
-			$(CC) $(CFLAGS) $^ -o $@
+			make -C asm
+			$(CC) $(CFLAGS) $^ $(ASM) -o $@
 
 %.o	:	%.c
 			$(CC) $(CFLAGS) -c $< -o $@
@@ -24,5 +27,6 @@ clean	:
 
 fclean	:	clean
 			$(RM) $(NAME)
+			make -C asm fclean
 
 re		:	fclean all

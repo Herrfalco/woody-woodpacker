@@ -1,20 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   aes_steps.h                                        :+:      :+:    :+:   */
+/*   aes_asm.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
+/*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 15:43:12 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/15 15:40:11 by fcadet           ###   ########.fr       */
+/*   Created: 2022/06/14 16:06:58 by fcadet            #+#    #+#             */
+/*   Updated: 2022/06/15 15:35:05 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef AES_STEPS_H
-#define AES_STEPS_H
+#ifndef AES_ASM_H
+#define AES_ASM_H
 
-void	shift_rows(uint8_t *block, method_t type);
-void	mix_columns(uint8_t *block, method_t type);
-void	add_rkeys(uint8_t *block, uint32_t *rkeys, uint8_t round);
+extern void			decode_block_asm(uint8_t *block, uint32_t *rkeys);
+void				sub_bytes_asm(uint8_t *block, method_t type);
 
-#endif // AES_STEPS_H
+#endif	// AES_ASM_H
