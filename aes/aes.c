@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/15 15:38:24 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/15 21:49:04 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,13 @@ static void			sub_word(uint8_t *word, method_t type) {
 		word[i] = box[i];
 }
 
+void			rot_word(uint32_t *word, uint8_t shift, method_t type) {
+	if (type == ENCODE)
+		*word = (*word >> shift * 8) | (*word << (4 - shift) * 8);
+	else
+		*word = (*word << shift * 8) | (*word >> (4 - shift) * 8);
+}
+
 void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	static const int32_t	rcon[] = {
 		0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
@@ -72,6 +79,8 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	}
 }
 
+#include "asm/aes_asm.h"
+
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	uint8_t		round;
 	uint8_t		r_nb = get_rnb();
@@ -79,7 +88,7 @@ static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	for (round = 0; round < r_nb; ++round) {
 		if (round) {
 			sub_bytes_asm(block, ENCODE);
-			shift_rows(block, ENCODE);
+			shift_rows_asm(block, ENCODE);
 			if (round + 1 < r_nb)
 				mix_columns(block, ENCODE);
 		}

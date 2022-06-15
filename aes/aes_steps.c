@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 15:40:47 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/15 15:40:04 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/15 21:51:02 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,6 @@
 #include "aes_steps.h"
 #include "aes_utils.h"
 #include "aes_tables.h"
-
-//////////////////// SHIFT_ROWS ////////////////////////
-
-void				shift_rows(uint8_t *block, method_t type) {
-	uint8_t		i;
-	uint32_t	*lines = (uint32_t *)block;
-
-	for (i = 0; i < 4; ++i)
-		rot_word(lines + i, i, type);
-}
 
 //////////////////// MIX_COLUMNS ////////////////////////
 
