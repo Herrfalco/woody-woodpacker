@@ -13,7 +13,7 @@
 typedef struct	s_dico {
 	size_t		size;
 	uint16_t	entry[DICO_SIZE + 1][2];
-	int			bits;
+	uint8_t		bits;
 }				t_dico;
 
 void		init_dico(t_dico *dico);

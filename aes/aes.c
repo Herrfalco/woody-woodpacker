@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/15 21:49:04 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/16 12:31:52 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 			if (round + 1 < r_nb)
 				mix_columns(block, ENCODE);
 		}
-		add_rkeys(block, rkeys, round);
+		add_rkeys_asm(block, rkeys, round);
 	}
 }
 

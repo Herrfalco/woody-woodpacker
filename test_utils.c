@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/15 21:18:06 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/16 12:38:18 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,28 +29,6 @@ int				rand_v_file(int *file, uint64_t size) {
 
 	if (src < 0)
 		return (-1);
-	if ((*file = open(".rand", O_RDWR | O_CREAT, 0666)) < 0)
-		return (close_ret(src, -1, -1, -1));
-	for (; size && (read_ret = read(src, buff, BUFF_SIZE)) > 0;
-			size = sat_sub(size, read_ret)) {
-		write_size = size > (size_t)read_ret ? (size_t)read_ret : size;
-		if (write(*file, buff, write_size) != write_size)
-			return (close_ret(src, *file, -1, -1));
-	}
-	if (read_ret < 0)
-		return (close_ret(src, *file, -1, -1));
-	close(src);
-	return (seek_ret(*file, -1, 0));
-}
-
-/*
-int				rand_v_file(int *file, uint64_t size) {
-	int			src = open("/dev/urandom", O_RDONLY);
-	uint8_t		buff[BUFF_SIZE];
-	ssize_t		read_ret, write_size;
-
-	if (src < 0)
-		return (-1);
 	if ((*file = syscall(319, "v_file", 0)) < 0)
 		return (close_ret(src, -1, -1, -1));
 	for (; size && (read_ret = read(src, buff, BUFF_SIZE)) > 0;
@@ -64,7 +42,6 @@ int				rand_v_file(int *file, uint64_t size) {
 	close(src);
 	return (seek_ret(*file, -1, 0));
 }
-*/
 
 static int		bin_n_cmp(uint8_t *b1, uint8_t *b2, uint64_t size) {
 	for (; size && *b1 == *b2; --size, ++b1, ++b2);

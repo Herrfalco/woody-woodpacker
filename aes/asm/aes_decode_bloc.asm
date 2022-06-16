@@ -1,6 +1,6 @@
 						global		decode_block_asm
 
-						extern		add_rkeys
+						extern		add_rkeys_asm
 						extern		mix_columns
 						extern		shift_rows_asm
 						extern		sub_bytes_asm
@@ -31,7 +31,7 @@ decode_block_asm:
 						mov			rsi,			[rsp+16]
 						xor			rdx,			rdx
 						mov			dl,				byte[rsp+1]
-						call		add_rkeys
+						call		add_rkeys_asm
 
 						mov			al,				byte[rsp+1]
 						cmp			al,				0
