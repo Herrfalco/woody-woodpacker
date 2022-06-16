@@ -6,13 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 22:10:26 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/07 15:05:37 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/16 14:29:27 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "data_rw.h"
 
+/*
 static int		test(uint16_t *vals, size_t vals_nb, size_t vals_sz, char *name) {
 	static uint16_t		mask = 0;
 	uint16_t			value;
@@ -40,8 +41,41 @@ static int		test(uint16_t *vals, size_t vals_nb, size_t vals_sz, char *name) {
 	close(fd);
 	return (0);
 }
+*/
+
+static int		variable_test(size_t vals_nb) {
+	uint16_t			value, mask;
+	uint32_t			i, v_size;
+	int					fd = open("test_file", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+	if (fd < 0)
+		return (fprintf(stderr, "Error: Can't open test_file\n"));
+	for (i = 0; i < vals_nb; ++i) {
+		v_size = i % 4 + 9;
+		value_writer(fd, i, v_size, i == vals_nb - 1);
+	}
+	close(fd);
+
+	if ((fd = open("test_file", O_RDONLY)) < 0)
+		return (fprintf(stderr, "Error: Can't open test_file\n"));
+	printf("byte_writer variable test: ");
+	for (i = 0; i < vals_nb; ++i) {
+		v_size = i % 4 + 9;
+		mask = ((uint16_t)~0) >> (16 - v_size);
+		value_reader(fd, &value, v_size);
+		if (value != (i & mask)) {
+			printf("KO\n");
+			close(fd);
+			return (0);
+		}
+	}
+	printf(i != vals_nb ? "KO\n" : "OK\n");
+	close(fd);
+	return (0);
+}
 
 int		main(void) {
+	/*
 	uint16_t	vals_9[] = {	0x1ce, 0x05a, 0x1a5, 0x137, 0x038,
 								0x1c7, 0x0cc, 0x133, 0x1c3, 0x1ff,
 								0x001, 0x111 };
@@ -63,6 +97,10 @@ int		main(void) {
 		fprintf(stderr, "Error: Can't generate random values\n");
 		return (1);
 	}
+	test(vals_rand, 1000000, 9, "9 bits random");
+	test(vals_rand, 1000000, 10, "10 bits random");
 	test(vals_rand, 1000000, 12, "12 bits random");
+	*/
+	variable_test(1000);
 	return (0);
 }

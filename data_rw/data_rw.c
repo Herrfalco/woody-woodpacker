@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/10 16:25:39 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/16 14:21:25 by herrfalco        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,8 @@ int		file_reader(int fd, uint8_t *byte) {
 int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
 	static uint32_t		buff = 0;
 	static uint8_t		buff_len = 0;
-	static uint16_t		mask = 0;
+	uint16_t			mask = ((uint16_t)~0) >> (16 - size);
 
-	if (!mask)
-		mask = ((uint16_t)~mask) >> (16 - size);
 	buff |= ((uint32_t)(value & mask)) << (32 - size - buff_len);
 	buff_len += size;
 	while (buff_len >= 8 || (flush && buff_len > 0)) {
@@ -62,12 +60,10 @@ int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
 int		value_reader(int fd, uint16_t *value, size_t size) {
 	static uint32_t		buff = 0;
 	static size_t		buff_size = 0;
-	static uint16_t		mask = 0;
 	int					read_ret;
 	uint8_t				byte;
+	uint16_t			mask = ((uint16_t)~0) >> (16 - size);
 
-	if (!mask)
-		mask = ((uint16_t)~mask) >> (16 - size);
 	while (buff_size <= 24 && (read_ret = file_reader(fd, &byte)) > 0) {
 		buff <<= 8;
 		buff |= byte;
