@@ -3,26 +3,30 @@
 #include "../data_rw/data_rw.h"
 
 static size_t	unlzw_chunk(int fd, int new_fd, int *reset) {
-	t_dico		dico = { 0 };
+	t_dico		dico;
 	uint16_t	value, last_value, first;
 
-	if (value_reader(fd, &last_value, 12) < 0)
+	init_dico(&dico);
+	if (value_reader(fd, &last_value, 9) < 0)
 		quit_2_fd(fd, new_fd, "can't read file");
 	file_writer(new_fd, last_value, NO_FLUSH);
 	if (*reset) {
-		if (value_reader(fd, &last_value, 12) < 0)
-			quit_2_fd(fd, new_fd, "can't read file");
-		file_writer(new_fd, last_value, NO_FLUSH);
+		*reset = 0;
+		return (DICO_SIZE);
 	}
-	for (; value_reader(fd, &value, 12) > 0; last_value = value) {
-		if (value > MAX_BYTE) {
-			if (value == RESET_CODE) {
-				*reset = 1;
-				return (DICO_SIZE);
-			}
-			else if (value == STOP_CODE)
-				return (0);
-			if (value > dico.size + 258)
+	for (; value_reader(fd, &value, dico.bits) > 0; last_value = value) {
+		if (value == RESET_CODE) {
+			*reset = 1;
+			return (DICO_SIZE);
+		}
+		else if (value == INCR_CODE) {
+			value = last_value;
+			++dico.bits;
+		}
+		else if (value == STOP_CODE)
+			return (0);
+		else if (value >= DICO_START) {
+			if (value >= dico.size + DICO_START)
 				not_in_dico(last_value, &dico);
 			first = entry_writer(new_fd, value, &dico);
 			new_entry(last_value, first, &dico);
@@ -32,6 +36,7 @@ static size_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 			new_entry(last_value, value, &dico);
 		}
 	}
+	printf("\n");
 	return (dico.size);
 }
 

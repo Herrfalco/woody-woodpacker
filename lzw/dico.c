@@ -2,12 +2,17 @@
 #include "lzw.h"
 #include "../data_rw/data_rw.h"
 
-size_t			get_bits_nb(size_t dico_size) {
+void			init_dico(t_dico *dico) {
+	dico->size = 0;
+	dico->bits = 9;
+}
+
+int				get_bits_nb(size_t dico_size) {
 	if (dico_size < 511)
 		return (9);
 	else if (dico_size < 1023)
 		return (10);
-	else if (dico_size < 2048)
+	else if (dico_size < 2047)
 		return (11);
 	else
 		return (12);
