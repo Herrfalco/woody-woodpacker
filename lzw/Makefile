@@ -4,7 +4,8 @@ SRCS	=	lzw.c \
 			dico.c \
 			main_test.c \
 			../utils.c \
-			../data_rw/data_rw.c
+			../data_rw/data_rw.c \
+			../test_utils.c
 
 OBJS	=	$(SRCS:.c=.o)
 

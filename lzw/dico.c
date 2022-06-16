@@ -8,11 +8,11 @@ void			init_dico(t_dico *dico) {
 }
 
 int				get_bits_nb(size_t dico_size) {
-	if (dico_size < 511)
+	if (dico_size < 258)
 		return (9);
-	else if (dico_size < 1023)
+	else if (dico_size < 765)
 		return (10);
-	else if (dico_size < 2047)
+	else if (dico_size < 1789)
 		return (11);
 	else
 		return (12);
