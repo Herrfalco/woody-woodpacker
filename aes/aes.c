@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/09 18:10:23 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/15 21:49:04 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include "aes.h"
 #include "aes_steps.h"
 #include "aes_utils.h"
+#include "aes_tables.h"
+#include "asm/aes_asm.h"
 
 int				rand_key(uint8_t *buff, size_t size) {
 	int			fd = open("/dev/urandom", O_RDONLY);
@@ -34,6 +36,22 @@ int				rand_key(uint8_t *buff, size_t size) {
 	}
 	close(fd);
 	return (0);
+}
+
+static void			sub_word(uint8_t *word, method_t type) {
+	static const uint8_t	s_box[] = S_BOX;
+	const uint8_t			*box = s_box + type * 256;
+	uint8_t					i;
+
+	for (i = 0; i < 4; ++i)
+		word[i] = box[i];
+}
+
+void			rot_word(uint32_t *word, uint8_t shift, method_t type) {
+	if (type == ENCODE)
+		*word = (*word >> shift * 8) | (*word << (4 - shift) * 8);
+	else
+		*word = (*word << shift * 8) | (*word >> (4 - shift) * 8);
 }
 
 void				round_keys(uint8_t *key, uint32_t *rkeys) {
@@ -61,36 +79,20 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	}
 }
 
+#include "asm/aes_asm.h"
+
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {
-	uint8_t		rk_i = 0;
 	uint8_t		round;
 	uint8_t		r_nb = get_rnb();
 
 	for (round = 0; round < r_nb; ++round) {
 		if (round) {
-			sub_bytes(block, ENCODE);
-			shift_rows(block, ENCODE);
+			sub_bytes_asm(block, ENCODE);
+			shift_rows_asm(block, ENCODE);
 			if (round + 1 < r_nb)
 				mix_columns(block, ENCODE);
 		}
-		add_rkeys(block, rkeys, &rk_i);
-	}
-}
-
-static void			decode_block(uint8_t *block, uint32_t *rkeys) {
-	uint8_t		rk_i;
-	int8_t		round;
-	uint8_t		r_nb = get_rnb();
-
-	for (round = r_nb - 1; round >= 0; --round) {
-		rk_i = round * 4;
-		add_rkeys(block, rkeys, &rk_i);
-		if (round) {
-			if (round + 1 < r_nb)
-				mix_columns(block, DECODE);
-			shift_rows(block, DECODE);
-			sub_bytes(block, DECODE);
-		}
+		add_rkeys(block, rkeys, round);
 	}
 }
 
@@ -102,5 +104,5 @@ void				aes_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) 
 			encode_block(data + i, r_keys);
 	else
 		for (i = 0; i < size; i += 16)
-			decode_block(data + i, r_keys);
+			decode_block_asm(data + i, r_keys);
 }
