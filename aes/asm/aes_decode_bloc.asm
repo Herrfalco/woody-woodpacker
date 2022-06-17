@@ -1,7 +1,7 @@
 						global		decode_block_asm
 
 						extern		add_rkeys_asm
-						extern		mix_columns
+						extern		mix_columns_asm
 						extern		shift_rows_asm
 						extern		sub_bytes_asm
 						extern		get_rnb
@@ -43,7 +43,7 @@ decode_block_asm:
 						
 						mov			rdi,			[rsp+24]
 						mov			rsi,			1
-						call		mix_columns
+						call		mix_columns_asm
 	.no_mix:
 						mov			rdi,			[rsp+24]
 						mov			rsi,			1

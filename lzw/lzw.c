@@ -25,8 +25,10 @@ static size_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz) {
 		if ((i = check_dico(last_byte, byte, &dico)) > 0)
 			last_byte = 258 + i;
 		else {
-			if (max_bit(last_byte) > (size_t)dico.bits)
+			if (max_bit(last_byte) > (size_t)dico.bits) {
+				printf("%d, %d\n", last_byte, dico.bits);
 				quit("wrong bit number");
+			}
 			value_writer(new_fd, last_byte, dico.bits, NO_FLUSH);
 			new_entry(last_byte, byte, &dico);
 			if (get_bits_nb(dico.size) != dico.bits) {

@@ -6,7 +6,7 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/16 12:36:41 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/17 13:19:22 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,7 @@ int		main(void) {
 		if ((diff = diff_v_files(in, out))) {
 			if (diff < 0)
 				quit("can't read files");
-			printf("diff: %d\n", diff);
-			printf("KO (size=%ld)\n", i);
+			printf("KO\n");
 			return (close_ret(in, crypt, out, 0));
 		}
 		printf("OK\n");

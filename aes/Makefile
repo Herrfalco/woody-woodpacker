@@ -1,7 +1,6 @@
 NAME	=	aes_test
 SRCS	=	aes.c \
 			aes_fd.c \
-			aes_steps.c \
 			aes_test.c \
 			aes_utils.c \
 			../test_utils.c \
@@ -9,7 +8,8 @@ SRCS	=	aes.c \
 ASM		=	asm/aes_decode_bloc.o \
 			asm/aes_sub_bytes.o \
 			asm/aes_shift_rows.o \
-			asm/aes_add_rkeys.o
+			asm/aes_add_rkeys.o \
+			asm/aes_mix_columns.o
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
@@ -28,6 +28,7 @@ clean	:
 			$(RM) $(OBJS)
 
 fclean	:	clean
+			$(RM) $(NAME)
 			make -C asm fclean
 
 re		:	fclean all

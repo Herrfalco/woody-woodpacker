@@ -6,13 +6,12 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/16 12:31:52 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/17 14:10:28 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "aes.h"
-#include "aes_steps.h"
 #include "aes_utils.h"
 #include "aes_tables.h"
 #include "asm/aes_asm.h"
@@ -79,8 +78,6 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	}
 }
 
-#include "asm/aes_asm.h"
-
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	uint8_t		round;
 	uint8_t		r_nb = get_rnb();
@@ -90,7 +87,7 @@ static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 			sub_bytes_asm(block, ENCODE);
 			shift_rows_asm(block, ENCODE);
 			if (round + 1 < r_nb)
-				mix_columns(block, ENCODE);
+				mix_columns_asm(block, ENCODE);
 		}
 		add_rkeys_asm(block, rkeys, round);
 	}
