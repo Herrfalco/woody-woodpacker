@@ -36,7 +36,6 @@ static size_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 			new_entry(last_value, value, &dico);
 		}
 	}
-	printf("\n");
 	return (dico.size);
 }
 
