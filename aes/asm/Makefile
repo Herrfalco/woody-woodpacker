@@ -3,7 +3,8 @@ SRCS	=	aes_decode_bloc.asm \
 			aes_shift.asm \
 			aes_add_rkeys.asm \
 			aes_mix_columns.asm \
-			aes_data_dec.asm
+			aes_data_dec.asm \
+			aes_get_rnb.asm
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm
 CFLAGS	=	-felf64

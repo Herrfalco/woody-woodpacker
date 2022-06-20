@@ -6,14 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:12:22 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/17 15:22:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/20 17:30:36 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef AES_H
 #define AES_H
 
-#define KEY_SIZE		256		// 128 | 192 | 256
+#define KEY_SIZE		256		// 128 | 192 | 256 (must update key_sz in round_keys_asm.asm)
 #define RKEY_ARR_SIZE	60
 
 typedef enum		method_e {

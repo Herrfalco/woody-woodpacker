@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/20 17:11:12 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/20 17:56:19 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	uint8_t					n = KEY_SIZE / 32;
 	uint32_t				tmp;
 
-	for (i = 0; i < 4 * get_rnb(); ++i) {
+	for (i = 0; i < 4 * get_rnb_asm(KEY_SIZE); ++i) {
 		if (i < n)
 			rkeys[i] = ((uint32_t *)key)[i];
 		else if (!(i % n)) {
@@ -63,7 +63,7 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	uint8_t		round;
-	uint8_t		r_nb = get_rnb();
+	uint8_t		r_nb = get_rnb_asm(KEY_SIZE);
 
 	for (round = 0; round < r_nb; ++round) {
 		if (round) {

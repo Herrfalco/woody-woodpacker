@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/17 15:26:53 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/20 18:00:24 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void			decode_fd(int fd_dst, int fd_src, uint32_t *r_keys) {
 	for (; src_sz && (read_ret = read(fd_src, buff, BUFF_SIZE)) > 0;
 			src_sz = sat_sub(src_sz, BUFF_SIZE)) {
 		write_sz = src_sz > BUFF_SIZE ? BUFF_SIZE : src_sz;
-		aes_data_dec_asm(buff, round_up(write_sz, 16), r_keys, get_rnb());
+		aes_data_dec_asm(buff, round_up(write_sz, 16), r_keys, get_rnb_asm(KEY_SIZE));
 		if ((write_ret = write(fd_dst, buff, write_sz)) < 0 || (size_t)write_ret < write_sz)
 			quit_2_fd(fd_src, fd_dst, "can't write to destination file");
 	}
