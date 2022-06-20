@@ -20,5 +20,6 @@ add_rkeys_asm:
 					inc			rdx
 					jmp			.loop
 
-	.end:			pop			rbp
+	.end:
+					pop			rbp
 					ret

@@ -4,7 +4,6 @@
 						extern		mix_columns_asm
 						extern		shift_rows_asm
 						extern		sub_bytes_asm
-						extern		get_rnb
 
 						section		.text
 decode_block_asm:	
@@ -13,27 +12,25 @@ decode_block_asm:
 
 						push		rdi					; block @ 24
 						push		rsi					; rkeys @ 16
-						sub			rsp,			16	; round @ 1
-														; r_nb @ 0
+						push		rdx					; r_nb @ 8
+						sub			rsp,			8	; round @ 0
 						
-						call		get_rnb
-						mov			byte[rsp],		al
-						mov			byte[rsp+1],	al
+						mov			byte[rsp],		dl
 	.loop:					
-						mov			al,				byte[rsp+1]
+						mov			al,				byte[rsp+8]
 						cmp			al,				0
 						je			.end
 
 						dec			al
-						mov			byte[rsp+1],	al
+						mov			byte[rsp+8],	al
 
 						mov			rdi,			[rsp+24]
 						mov			rsi,			[rsp+16]
 						xor			rdx,			rdx
-						mov			dl,				byte[rsp+1]
+						mov			dl,				byte[rsp+8]
 						call		add_rkeys_asm
 
-						mov			al,				byte[rsp+1]
+						mov			al,				byte[rsp+8]
 						cmp			al,				0
 						je			.end
 
@@ -55,6 +52,6 @@ decode_block_asm:
 
 						jmp			.loop
 	.end:				
-						add			rsp,		32
+						mov			rsp,		rbp
 						pop			rbp
 						ret

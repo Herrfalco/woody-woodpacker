@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/17 14:10:28 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/17 15:23:21 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,9 @@ static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	}
 }
 
-void				aes_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
+void				aes_data_enc(uint8_t *data, uint64_t size, uint32_t *r_keys) {
 	uint64_t	i;
 
-	if (type == ENCODE)
-		for (i = 0; i < size; i += 16)
-			encode_block(data + i, r_keys);
-	else
-		for (i = 0; i < size; i += 16)
-			decode_block_asm(data + i, r_keys);
+	for (i = 0; i < size; i += 16)
+		encode_block(data + i, r_keys);
 }

@@ -76,7 +76,7 @@ mix_columns_asm:
 					mov			rax,				qword[rsp+8]
 					mov			qword[rdi+8],		rax
 
-					add			rsp,				16
+					mov			rsp,				rbp
 					pop			rbp
 					ret
 

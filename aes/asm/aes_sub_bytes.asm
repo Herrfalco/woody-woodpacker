@@ -21,7 +21,8 @@ sub_bytes_asm:
 					inc			rcx
 					jmp			.loop
 
-	.end:			pop			rbp
+	.end:
+					pop			rbp
 					ret
 
 					section		.data
