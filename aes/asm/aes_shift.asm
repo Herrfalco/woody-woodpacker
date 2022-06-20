@@ -1,4 +1,5 @@
 					global		shift_rows_asm
+					global		shift_word_asm
 
 					section		.text
 shift_rows_asm:	
@@ -53,5 +54,33 @@ shift_rows_asm:
 					inc			r9
 					jmp			.enc
 	.end:
+					mov			rsp,				rbp
+					pop			rbp
+					ret
+
+shift_word_asm:
+					push		rbp
+					mov			rbp,				rsp
+
+					xor			rax,				rax
+					mov			eax,				dword[rdi]
+					mov			rbx,				rax
+
+					mov			rcx,				rsi
+					mov			rdx,				rcx
+
+					imul		rcx,				8
+					shr			rax,				cl
+
+					mov			rcx,				4
+					sub			rcx,				rdx
+					imul		rcx,				8
+					shl			rbx,				cl
+
+					xor			rax,				rbx
+
+					mov			dword[rdi],			eax
+
+					mov			rsp,				rbp
 					pop			rbp
 					ret

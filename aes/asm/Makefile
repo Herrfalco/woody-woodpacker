@@ -1,6 +1,6 @@
 SRCS	=	aes_decode_bloc.asm \
-			aes_sub_bytes.asm \
-			aes_shift_rows.asm \
+			aes_sub.asm \
+			aes_shift.asm \
 			aes_add_rkeys.asm \
 			aes_mix_columns.asm \
 			aes_data_dec.asm

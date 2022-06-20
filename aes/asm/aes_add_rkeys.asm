@@ -21,5 +21,6 @@ add_rkeys_asm:
 					jmp			.loop
 
 	.end:
+					mov			rsp,				rbp
 					pop			rbp
 					ret

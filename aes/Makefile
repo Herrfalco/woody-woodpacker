@@ -6,8 +6,8 @@ SRCS	=	aes.c \
 			../test_utils.c \
 			../utils.c
 ASM		=	asm/aes_decode_bloc.o \
-			asm/aes_sub_bytes.o \
-			asm/aes_shift_rows.o \
+			asm/aes_sub.o \
+			asm/aes_shift.o \
 			asm/aes_add_rkeys.o \
 			asm/aes_mix_columns.o \
 			asm/aes_data_dec.o
