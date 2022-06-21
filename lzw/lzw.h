@@ -10,14 +10,16 @@
 # define MAX_BYTE	255
 
 
-typedef struct	s_dico {
-	size_t		size;
+struct			s_dico {
+	uint64_t	size;
 	uint16_t	entry[DICO_SIZE + 1][2];
 	uint8_t		bits;
-}				t_dico;
+}				__attribute__((packed));
+
+typedef struct	s_dico		t_dico;
 
 void		init_dico(t_dico *dico);
-int			get_bits_nb(size_t dico_size);
+int			get_bits_nb(uint64_t dico_size);
 void		new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico);
 int			check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
 uint16_t	entry_writer(int fd, uint16_t value, t_dico *dico);

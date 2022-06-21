@@ -7,7 +7,7 @@ void			init_dico(t_dico *dico) {
 	dico->bits = 9;
 }
 
-int				get_bits_nb(size_t dico_size) {
+int				get_bits_nb(uint64_t dico_size) {
 	if (dico_size < 258)
 		return (9);
 	else if (dico_size < 765)
@@ -19,7 +19,7 @@ int				get_bits_nb(size_t dico_size) {
 }
 
 void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
-	size_t	i;
+	uint64_t	i;
 
 	for (i = 0; i < dico->size; ++i)
 		if (dico->entry[i][0] == last_byte && dico->entry[i][1] == byte)
@@ -30,7 +30,7 @@ void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
 }
 
 int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
-	size_t	i;
+	uint64_t	i;
 
 	for (i = 0; i < dico->size; ++i)
 		if (last_value == dico->entry[i][0] && value == dico->entry[i][1])
@@ -64,5 +64,3 @@ void			not_in_dico(uint16_t last_value, t_dico *dico) {
 	else
 		new_entry(last_value, find_first_pattern(last_value, dico), dico);
 }
-
-

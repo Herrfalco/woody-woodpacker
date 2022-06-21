@@ -2,10 +2,10 @@
 #include "lzw.h"
 #include "../data_rw/data_rw.h"
 
-static size_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz, uint8_t *nb_bits) {
+static uint64_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz, uint8_t *nb_bits) {
 	t_dico		dico;
 	uint16_t	byte, last_byte;
-	ssize_t		i;
+	uint64_t	i;
 
 	last_byte = 0;
 	init_dico(&dico);

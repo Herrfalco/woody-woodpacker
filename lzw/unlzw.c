@@ -1,8 +1,9 @@
 #include "../includes.h"
 #include "lzw.h"
 #include "../data_rw/data_rw.h"
+#include "asm/unlzw_asm.h"
 
-static size_t	unlzw_chunk(int fd, int new_fd, int *reset) {
+static uint64_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 	t_dico		dico;
 	uint16_t	value, last_value, first;
 
@@ -46,7 +47,8 @@ void		unlzw(int fd) {
 	if ((new_fd = open("uncompressed_file", O_WRONLY | O_TRUNC | O_CREAT, 0777)) == -1)
 		quit_fd(fd, "Can not create uncompressed file.");
 	lseek(fd, 0, SEEK_SET);
-	while (unlzw_chunk(fd, new_fd, &reset) >= DICO_SIZE);
+	if (get_fd_size(fd) > 0)
+		while (unlzw_chunk(fd, new_fd, &reset) >= DICO_SIZE);
 	file_writer(new_fd, 0, ONLY_FLUSH);
 	close(fd);
 	close(new_fd);
