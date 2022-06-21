@@ -1,4 +1,5 @@
 					global		sub_bytes_asm
+					global		sub_word_asm
 
 					section		.text
 sub_bytes_asm:	
@@ -21,7 +22,32 @@ sub_bytes_asm:
 					inc			rcx
 					jmp			.loop
 
-	.end:			pop			rbp
+	.end:
+					mov			rsp,			rbp
+					pop			rbp
+					ret
+
+sub_word_asm:
+					push		rbp
+					mov			rbp,			rsp
+
+					mov			rdx,			s_box
+
+					xor			rcx,			rcx
+					xor			rax,			rax
+	.loop:
+					cmp			rcx,			4
+					je			.end
+					
+					mov			al,				byte[rdx+rcx]
+					mov			byte[rdi+rcx],	al
+
+					inc			rcx
+					jmp			.loop
+
+	.end:
+					mov			rsp,			rbp
+					pop			rbp
 					ret
 
 					section		.data

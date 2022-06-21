@@ -6,14 +6,13 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/17 14:10:28 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/20 17:56:19 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "aes.h"
 #include "aes_utils.h"
-#include "aes_tables.h"
 #include "asm/aes_asm.h"
 
 int				rand_key(uint8_t *buff, size_t size) {
@@ -37,22 +36,6 @@ int				rand_key(uint8_t *buff, size_t size) {
 	return (0);
 }
 
-static void			sub_word(uint8_t *word, method_t type) {
-	static const uint8_t	s_box[] = S_BOX;
-	const uint8_t			*box = s_box + type * 256;
-	uint8_t					i;
-
-	for (i = 0; i < 4; ++i)
-		word[i] = box[i];
-}
-
-void			rot_word(uint32_t *word, uint8_t shift, method_t type) {
-	if (type == ENCODE)
-		*word = (*word >> shift * 8) | (*word << (4 - shift) * 8);
-	else
-		*word = (*word << shift * 8) | (*word >> (4 - shift) * 8);
-}
-
 void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	static const int32_t	rcon[] = {
 		0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
@@ -61,17 +44,17 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 	uint8_t					n = KEY_SIZE / 32;
 	uint32_t				tmp;
 
-	for (i = 0; i < 4 * get_rnb(); ++i) {
+	for (i = 0; i < 4 * get_rnb_asm(KEY_SIZE); ++i) {
 		if (i < n)
 			rkeys[i] = ((uint32_t *)key)[i];
 		else if (!(i % n)) {
 			tmp = rkeys[i - 1];
-			rot_word(&tmp, 1, ENCODE);
-			sub_word((uint8_t *)&tmp, ENCODE);
+			shift_word_asm(&tmp, 1);
+			sub_word_asm((uint8_t *)&tmp);
 			rkeys[i] = rkeys[i - n] ^ tmp ^ rcon[i / n];
 		} else if (n > 6 && i % n == 4) {
 			tmp = rkeys[i - 1];
-			sub_word((uint8_t *)&tmp, ENCODE);
+			sub_word_asm((uint8_t *)&tmp);
 			rkeys[i] = rkeys[i - n] ^ tmp;
 		} else
 			rkeys[i] = rkeys[i - n] ^ rkeys[i - 1];
@@ -80,7 +63,7 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 
 static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	uint8_t		round;
-	uint8_t		r_nb = get_rnb();
+	uint8_t		r_nb = get_rnb_asm(KEY_SIZE);
 
 	for (round = 0; round < r_nb; ++round) {
 		if (round) {
@@ -93,13 +76,9 @@ static void			encode_block(uint8_t *block, uint32_t *rkeys) {
 	}
 }
 
-void				aes_data(uint8_t *data, uint64_t size, uint32_t *r_keys, method_t type) {
+void				aes_data_enc(uint8_t *data, uint64_t size, uint32_t *r_keys) {
 	uint64_t	i;
 
-	if (type == ENCODE)
-		for (i = 0; i < size; i += 16)
-			encode_block(data + i, r_keys);
-	else
-		for (i = 0; i < size; i += 16)
-			decode_block_asm(data + i, r_keys);
+	for (i = 0; i < size; i += 16)
+		encode_block(data + i, r_keys);
 }
