@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/20 18:00:24 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/22 16:41:15 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void			decode_fd(int fd_dst, int fd_src, uint32_t *r_keys) {
 void				aes_fd(int fd_dst, int fd_src, uint8_t *key, method_t type) {
 	uint32_t		r_keys[RKEY_ARR_SIZE] = { 0 };
 
-	round_keys(key, r_keys);
+	round_keys_asm(key, r_keys);
 	if (type == ENCODE)
 		encode_fd(fd_dst, fd_src, r_keys);
 	else

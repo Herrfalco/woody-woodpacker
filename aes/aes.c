@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/20 17:56:19 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/22 22:35:49 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,23 +41,26 @@ void				round_keys(uint8_t *key, uint32_t *rkeys) {
 		0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
 		0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000 };
 	uint8_t					i;
+	uint8_t					r_keys_nb = get_rnb_asm(KEY_SIZE) * 4;
 	uint8_t					n = KEY_SIZE / 32;
 	uint32_t				tmp;
 
-	for (i = 0; i < 4 * get_rnb_asm(KEY_SIZE); ++i) {
+	for (i = 0; i < r_keys_nb; ++i) {
 		if (i < n)
 			rkeys[i] = ((uint32_t *)key)[i];
 		else if (!(i % n)) {
 			tmp = rkeys[i - 1];
 			shift_word_asm(&tmp, 1);
 			sub_word_asm((uint8_t *)&tmp);
-			rkeys[i] = rkeys[i - n] ^ tmp ^ rcon[i / n];
+			rkeys[i] = rkeys[i - n] ^ tmp ^ rcon[i / n - 1];
 		} else if (n > 6 && i % n == 4) {
 			tmp = rkeys[i - 1];
 			sub_word_asm((uint8_t *)&tmp);
 			rkeys[i] = rkeys[i - n] ^ tmp;
-		} else
-			rkeys[i] = rkeys[i - n] ^ rkeys[i - 1];
+		} else {
+			tmp = rkeys[i - 1];
+			rkeys[i] = rkeys[i - n] ^ tmp;
+		}
 	}
 }
 

@@ -1,0 +1,2 @@
+- change imul for mul after changing main test to verify there's no change
+- change stack operation like cmp with no register
