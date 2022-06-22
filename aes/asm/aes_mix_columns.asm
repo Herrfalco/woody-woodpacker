@@ -9,9 +9,11 @@ mix_columns_asm:
 					mov			qword[rsp],			0
 					mov			qword[rsp+8],		0
 
-					mov			rdx,				mix_mat
-					imul		rsi,				16
-					add			rdx,				rsi
+					mov			rax,				rsi
+					mov			rbx,				16
+					mul			rbx,
+					mov			r14,				mix_mat
+					add			r14,				rax
 
 					xor			r8,					r8
 	.for_1:
@@ -27,19 +29,16 @@ mix_columns_asm:
 			.for_3:
 					cmp			r10,				4
 					je			.for_2_inc
-
 ;mix[y+i] -> r11
 					mov			rax,				r9
 					add			rax,				r10
 					xor			r11,				r11
-					mov			r11b,				byte[rdx+rax]
-
+					mov			r11b,				byte[r14+rax]
 ;block[i*4+x] -> r12
 					mov			rbx,				rdi
 					add			rbx,				r8
 					xor			r12,				r12
 					mov			r12b,				byte[rbx+r10*4]
-
 ;&(tmp[y+x]) -> r13
 					mov			r13,				r8
 					add			r13,				r9
@@ -48,28 +47,24 @@ mix_columns_asm:
 					cmp			r11,				6
 					je			.eq
 
-					imul		r11,				256
-					add			r11,				r12
-					mov			rax,				mult_mat
+					mov			rax,				r11
+					mov			r11,				256
+					mul			r11
+					add			rax,				r12
+					mov			rbx,				mult_mat
 					xor			r12,				r12
-					mov			r12b,				byte[rax+r11]
-
+					mov			r12b,				byte[rbx+rax]
 				.eq:
-
 					xor			byte[r13],			r12b
-
 			.for_3_inc:
 					inc			r10,
 					jmp			.for_3
-
 		.for_2_inc:
 					add			r9,					4
 					jmp			.for_2
-
 	.for_1_inc:
 					inc			r8
 					jmp			.for_1
-
 	.end:
 					mov			rax,				qword[rsp]
 					mov			qword[rdi],			rax

@@ -7,27 +7,30 @@ shift_rows_asm:
 					mov			rbp,				rsp
 					
 					xor			r9,					r9
+					mov			r11,				8
 					cmp			rsi,				0
 					jne			.enc
 	.dec:
 					cmp			r9,					4
 					je			.end
 
-					mov			eax,				dword[rdi+r9*4]
-					mov			ebx,				eax
+					mov			r10d,				dword[rdi+r9*4]
+					mov			ebx,				r10d
 
-					mov			rcx,				r9
-					imul		rcx,				8
-					shl			eax,				cl
+					mov			rax,				r9
+					mul			r11
+					mov			rcx,				rax
+					shl			r10d,				cl
 
 					push		byte 4
 					sub			byte[rsp],			r9b
-					pop			rcx
-					imul		rcx,				8
+					pop			rax
+					mul			r11
+					mov			rcx,				rax
 					shr			ebx,				cl
 
-					or			eax,				ebx
-					mov			dword[rdi+r9*4],	eax
+					or			r10d,				ebx
+					mov			dword[rdi+r9*4],	r10d
 
 					inc			r9
 					jmp			.dec
@@ -35,21 +38,23 @@ shift_rows_asm:
 					cmp			r9,					4
 					je			.end
 
-					mov			eax,				dword[rdi+r9*4]
-					mov			ebx,				eax
+					mov			r10d,				dword[rdi+r9*4]
+					mov			ebx,				r10d
 
-					mov			rcx,				r9
-					imul		rcx,				8
-					shr			eax,				cl
+					mov			rax,				r9
+					mul			r11
+					mov			rcx,				rax
+					shr			r10d,				cl
 
 					push		byte 4
 					sub			byte[rsp],			r9b
-					pop			rcx
-					imul		rcx,				8
+					pop			rax
+					mul			r11
+					mov			rcx,				rax
 					shl			ebx,				cl
 
-					or			eax,				ebx
-					mov			dword[rdi+r9*4],	eax
+					or			r10d,				ebx
+					mov			dword[rdi+r9*4],	r10d
 
 					inc			r9
 					jmp			.enc
@@ -62,24 +67,27 @@ shift_word_asm:
 					push		rbp
 					mov			rbp,				rsp
 
-					xor			rax,				rax
-					mov			eax,				dword[rdi]
-					mov			rbx,				rax
+					xor			r10,				r10
+					mov			r10d,				dword[rdi]
+					mov			rbx,				r10
 
-					mov			rcx,				rsi
-					mov			rdx,				rcx
+					mov			rax,				rsi
+					mov			rdx,				rax
 
-					imul		rcx,				8
-					shr			rax,				cl
+					mov			r11,				8
+					mul			r11
+					mov			rcx,				rax
+					shr			r10,				cl
 
-					mov			rcx,				4
-					sub			rcx,				rdx
-					imul		rcx,				8
+					mov			rax,				4
+					sub			rax,				rdx
+					mul			r11
+					mov			rcx,				rax
 					shl			rbx,				cl
 
-					xor			rax,				rbx
+					xor			r10,				rbx
 
-					mov			dword[rdi],			eax
+					mov			dword[rdi],			r10d
 
 					mov			rsp,				rbp
 					pop			rbp

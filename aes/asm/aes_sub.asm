@@ -6,9 +6,11 @@ sub_bytes_asm:
 					push		rbp
 					mov			rbp,			rsp
 					
-					mov			rdx,			s_box
-					imul		rsi,			256
-					lea			rdx,			[rdx+rsi]
+					mov			rbx,			s_box
+					mov			rax,			rsi
+					mov			r8,				256
+					mul			r8
+					lea			rdx,			[rbx+rax]
 
 					xor			rcx,			rcx
 					xor			rax,			rax

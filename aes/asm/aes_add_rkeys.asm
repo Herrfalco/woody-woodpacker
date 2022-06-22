@@ -4,20 +4,21 @@
 add_rkeys_asm:	
 					push		rbp
 					mov			rbp,				rsp
+					mov			rax,				rdx
+					mov			rdx,				4
 					
-					imul		rdx,				4
+					mul			rdx
 					xor			rcx,				rcx
 	.loop:
 					cmp			rcx,				4
 					je			.end
 
 					mov			r10d,				dword[rdi+rcx*4]
-					mov			r11d,				dword[rsi+rdx*4]
-					xor			r10d,				r11d
+					xor			r10d,				dword[rsi+rax*4]
 					mov			dword[rdi+rcx*4],	r10d
 
 					inc			rcx
-					inc			rdx
+					inc			rax
 					jmp			.loop
 
 	.end:
