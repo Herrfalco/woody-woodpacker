@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   includes.h                                         :+:      :+:    :+:   */
+/*   utils_asm.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 22:07:07 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/10 16:07:44 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 16:23:33 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INCLUDES_H
-#define INCLUDES_H
+#ifndef UTILS_ASM_H
+#define UTILS_ASM_H
 
 #include <stdint.h>
 #include <unistd.h>
@@ -20,20 +20,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ERR_STAT		42
-#define BUFF_SIZE		1024
+#define BUFF_SIZE		1024	// (must update buff_sz in aes_fd_dec.asm)
 
-typedef enum	bool_e {
-	FALSE,
-	TRUE,
-}				bool_t;
+uint64_t	str_len_asm(char *str);
 
-void		quit_2_fd(int fd1, int fd2, char *error);
-void		quit_fd(int fd, char *error);
-void		quit(char *error);
-uint64_t	sat_sub(uint64_t lhs, uint64_t rhs);
-int			seek_ret(int f1, int f2, int ret);
-int64_t		get_fd_size(int fd);
+void		quit_2_fd_asm(uint8_t fd1, uint8_t fd2, char *error);
+void		quit_fd_asm(uint8_t fd, char *error);
+void		quit_asm(char *error);
 
+uint64_t	sat_sub_asm(uint64_t lhs, uint64_t rhs);
+uint8_t		seek_asm(uint8_t f1, uint8_t f2);
+int64_t		get_fd_size_asm(int fd);
 
-#endif // INCLUDES_H
+#endif // UTILS_ASM_H

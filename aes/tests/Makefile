@@ -4,8 +4,12 @@ OBJS	=	$(SRCS:.c=.o)
 AES		=	../aes.o \
 			../aes_fd.o \
 			../aes_utils.o \
-			../../test_utils.o \
-			../../utils.o \
+			../../utils/test_utils.o \
+			../../utils/utils.o \
+			../../utils/asm/str_len.o \
+			../../utils/asm/quit.o \
+			../../utils/asm/sat_sub.o \
+			../../utils/asm/seek.o \
 			../asm/aes_decode_bloc.o \
 			../asm/aes_sub.o \
 			../asm/aes_shift.o \
@@ -22,6 +26,7 @@ all		:	$(NAME)
 
 $(NAME)	:	$(OBJS)
 			make -C ..
+			make -C ../../utils
 			$(CC) $(CFLAGS) $^ $(AES) -o $@
 
 %.o	:	%.c
@@ -33,5 +38,6 @@ clean	:
 fclean	:	clean
 			$(RM) $(NAME)
 			make -C .. fclean
+			make -C ../../utils fclean
 
 re		:	fclean all

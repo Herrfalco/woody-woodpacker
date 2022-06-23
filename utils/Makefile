@@ -1,13 +1,12 @@
-SRCS	=	aes.c \
-			aes_fd.c \
-			aes_utils.c
+SRCS	=	test_utils.c \
+			utils.c
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
 RM		=	rm -rf
 
 all		:	$(OBJS)
-			make -C asm
+			make -C asm	
 
 %.o		:	%.c
 			$(CC) $(CFLAGS) -c $< -o $@

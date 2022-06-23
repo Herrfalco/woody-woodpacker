@@ -6,14 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/22 22:45:27 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 13:50:47 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes.h"
+#include "../utils/utils.h"
 #include "aes.h"
 #include "aes_utils.h"
-#include "asm/aes_asm.h"
+#include "aes_asm.h"
 
 int				rand_key(uint8_t *buff, size_t size) {
 	int			fd = open("/dev/urandom", O_RDONLY);

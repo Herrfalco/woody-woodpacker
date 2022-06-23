@@ -6,12 +6,13 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 00:32:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 16:11:03 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes.h"
-#include "../../test_utils.h"
+#include "../../utils/utils.h"
+#include "../../utils/utils_asm.h"
+#include "../../utils/test_utils.h"
 #include "../aes.h"
 
 #define KEY		"ckH1eMrBA0as6qabw352mxmP0Bxw76NB"
@@ -42,39 +43,39 @@ int		main(void) {
 }
 */
 
-static int		file_test(char *file) {
-	int			v_crypt, v_uncrypt, crypt, source;
+static int		file(char *file) {
+	int			v_crypt, v_decrypt, crypt, source;
 	uint8_t		key[] = KEY;
 	char		buff[1024];
 
 	if ((v_crypt = syscall(319, "v_file", 0)) < 0)
-		quit("can't open virtual file");
-	if ((v_uncrypt = syscall(319, "v_file", 0)) < 0)
-		quit_fd(v_crypt, "can't open virtual file");
+		quit_asm("can't open virtual file");
+	if ((v_decrypt = syscall(319, "v_file", 0)) < 0)
+		quit_fd_asm(v_crypt, "can't open virtual file");
 	sprintf(buff, "files/%s", file);
 	if ((crypt = open(buff, O_RDONLY)) < 0)
-		quit_2_fd(v_crypt, v_uncrypt, "can't open crypted file");
+		quit_2_fd_asm(v_crypt, v_decrypt, "can't open crypted file");
 	sprintf(buff, "/usr/bin/%s", file);
 	if ((source = open(buff, O_RDONLY)) < 0) {
-		close_ret(v_crypt, v_uncrypt, crypt, 0);
-		quit("can't open uncrypted file");
+		close_ret(v_crypt, v_decrypt, crypt, 0);
+		quit_asm("can't open decrypted file");
 	}
 
-	aes_fd(v_crypt, source, key, ENCODE);
-	aes_fd(v_uncrypt, crypt, key, DECODE);
+	aes_fd_enc(v_crypt, source, key);
+	aes_fd_dec(v_decrypt, crypt, key);
 
-	if (seek_ret(crypt, source, 0)) {
-		close_ret(v_crypt, v_uncrypt, crypt, 0);
-		quit_fd(source, "can't seek into files");
+	if (seek_asm(v_crypt, v_decrypt) || seek_asm(crypt, source)) {
+		close_ret(v_crypt, v_decrypt, crypt, 0);
+		quit_fd_asm(source, "can't seek into files");
 	}
 
-	printf("aes %s encoding test: ", file);
+	printf("AES %s encoding: ", file);
 	printf("%s\n", diff_v_files(v_crypt, crypt) ? "KO" : "OK");
-	printf("aes %s decoding test: ", file);
-	printf("%s\n", diff_v_files(v_uncrypt, source) ? "KO" : "OK");
+	printf("AES %s decoding: ", file);
+	printf("%s\n", diff_v_files(v_decrypt, source) ? "KO" : "OK");
 
 	close(source);
-	return (close_ret(v_crypt, v_uncrypt, crypt, 0));
+	return (close_ret(v_crypt, v_decrypt, crypt, 0));
 }
 
 int		main(void) {
@@ -84,20 +85,28 @@ int		main(void) {
 	uint64_t	i;
 
 	for (int i = 0; i < 5; ++i)
-		file_test(files[i]);
+		file(files[i]);
 	for (i = 0; i < 10000000; i += i * 2 + 1) {
 		if (rand_key(key, KEY_SIZE) < 0)
-			quit("can't generate random key");
+			quit_asm("can't generate random key");
 		if (rand_v_file(&in, i) < 0
 				|| (crypt = syscall(319, "v_file", 0)) < 0
 				|| (out = syscall(319, "v_file", 0)) < 0)
-			quit("can't open virtual file");
-		aes_fd(crypt, in, key, ENCODE);
-		aes_fd(out, crypt, key, DECODE);
-		printf("aes random file (%ld bytes) test: ", i);
+			quit_asm("can't open virtual file");
+		aes_fd_enc(crypt, in, key);
+		if (seek_asm(crypt, 0)) {
+			close_ret(in, out, crypt, 0);	
+			quit_asm("can't seek into files");
+		}
+		aes_fd_dec(out, crypt, key);
+		if (seek_asm(in, out)) {
+			close_ret(in, out, crypt, 0);	
+			quit_asm("can't seek into files");
+		}
+		printf("AES random file (%ld bytes): ", i);
 		if ((diff = diff_v_files(in, out))) {
 			if (diff < 0)
-				quit("can't read files");
+				quit_asm("can't read files");
 			printf("KO\n");
 			return (close_ret(in, crypt, out, 0));
 		}
