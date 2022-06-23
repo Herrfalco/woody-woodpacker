@@ -6,13 +6,14 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/23 16:14:03 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 16:54:27 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.h"
 #include "utils_asm.h"
 
+// A Supprimer
 int				close_ret(int f1, int f2, int f3, int ret) {
 	if (f1 > -1)
 		close(f1);

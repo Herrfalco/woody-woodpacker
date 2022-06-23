@@ -1,3 +1,5 @@
+					global		quit_4_fd_asm
+					global		quit_3_fd_asm
 					global		quit_2_fd_asm
 					global		quit_fd_asm
 					global		quit_asm
@@ -5,26 +7,32 @@
 					extern		str_len_asm
 
 					section		.text
-quit_2_fd_asm:
+quit_4_fd_asm:
 					push		rbp
 					mov			rbp,			rsp
 
-					push		rsi
-					push		rdx
+					push		rdi				; fd_1	+32
+					push		rsi				; fd_2	+24
+					push		rdx				; fd_3	+16
+					push		rcx				; fd_4	+8
+					push		r8				; msg	+0
 
+
+					mov			r9,				1
+	.loop
+					cmp			r9,				5
+					je			.msg
+
+					mov			rdi,			qword[rsp+r9*8]
 					cmp			rdi,			0
-					je			.fd2
+					je			.inc
 
 					mov			rax,			3
 					syscall
-	.fd2:
-					mov			rdi,			qword[rsp+8]
-					cmp			rdi,			0
-					je			.error
-
-					mov			rax,			3
-					syscall
-	.error:
+	.inc
+					inc			r9
+					jmp			.loop
+	.msg:
 					mov			rdi,			qword[rsp]
 					cmp			rdi,			0
 					je			.exit
@@ -58,12 +66,36 @@ quit_2_fd_asm:
 					pop			rbp
 					ret
 
+quit_3_fd_asm:
+					push		rbp
+					mov			rbp,			rsp
+
+					mov			r8,				rcx
+					xor			rcx,			rcx
+					call		quit_4_fd_asm
+
+					mov			rsp,			rbp
+					pop			rbp
+					ret
+
+quit_2_fd_asm:
+					push		rbp
+					mov			rbp,			rsp
+
+					mov			rcx,			rdx
+					xor			rdx,			rdx
+					call		quit_3_fd_asm
+
+					mov			rsp,			rbp
+					pop			rbp
+					ret
+
 quit_fd_asm:
 					push		rbp
 					mov			rbp,			rsp
 
 					mov			rdx,			rsi
-					mov			rsi,			0
+					xor			rsi,			rsi
 					call		quit_2_fd_asm
 
 					mov			rsp,			rbp
@@ -75,7 +107,7 @@ quit_asm:
 					mov			rbp,			rsp
 
 					mov			rsi,			rdi
-					mov			rdi,			0
+					xor			rdi,			rdi
 					call		quit_fd_asm
 
 					mov			rsp,			rbp

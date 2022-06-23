@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 22:07:07 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 16:23:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 16:30:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 
 uint64_t	str_len_asm(char *str);
 
+void		quit_4_fd_asm(uint8_t fd1, uint8_t fd2, uint8_t fd3, uint8_t fd4, char *error);
+void		quit_3_fd_asm(uint8_t fd1, uint8_t fd2, uint8_t fd3, char *error);
 void		quit_2_fd_asm(uint8_t fd1, uint8_t fd2, char *error);
 void		quit_fd_asm(uint8_t fd, char *error);
 void		quit_asm(char *error);
