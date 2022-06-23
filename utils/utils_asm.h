@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 22:07:07 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 16:30:14 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 17:00:37 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void		quit_asm(char *error);
 
 uint64_t	sat_sub_asm(uint64_t lhs, uint64_t rhs);
 uint8_t		seek_asm(uint8_t f1, uint8_t f2);
+
 int64_t		get_fd_size_asm(int fd);
 
 #endif // UTILS_ASM_H

@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/23 16:54:27 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/23 17:04:23 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,5 @@ int				diff_v_files(int f1, int f2) {
 		if (rd_ret_1 != rd_ret_2 || bin_n_cmp(buff_1, buff_2, rd_ret_1))
 			return (seek_asm(f1, f2) ? -1 : 1);
 	}
-	if (rd_ret_1 < 0 || rd_ret_2 < 0) {
-		seek_asm(f1, f2);
-		return (-1);
-	}
-	return (seek_asm(f1, f2) ? -1 : 0);
+	return ((seek_asm(f1, f2) || rd_ret_1 < 0 || rd_ret_2 < 0) ? -1 : 0);
 }
