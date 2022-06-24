@@ -18,6 +18,7 @@ shift_rows_asm:
 					mov			ebx,				r10d
 
 					mov			rax,				r9
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shl			r10d,				cl
@@ -25,6 +26,7 @@ shift_rows_asm:
 					push		byte 4
 					sub			byte[rsp],			r9b
 					pop			rax
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shr			ebx,				cl
@@ -42,6 +44,7 @@ shift_rows_asm:
 					mov			ebx,				r10d
 
 					mov			rax,				r9
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shr			r10d,				cl
@@ -49,6 +52,7 @@ shift_rows_asm:
 					push		byte 4
 					sub			byte[rsp],			r9b
 					pop			rax
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shl			ebx,				cl
@@ -75,12 +79,14 @@ shift_word_asm:
 					mov			rdx,				rax
 
 					mov			r11,				8
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shr			r10,				cl
 
 					mov			rax,				4
 					sub			rax,				rdx
+					xor			rdx,				rdx
 					mul			r11
 					mov			rcx,				rax
 					shl			rbx,				cl

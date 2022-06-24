@@ -10,6 +10,7 @@ mix_columns_asm:
 					mov			qword[rsp+8],		0
 
 					mov			rax,				rsi
+					xor			rdx,				rdx
 					mov			rbx,				16
 					mul			rbx,
 					mov			r14,				mix_mat
@@ -48,6 +49,7 @@ mix_columns_asm:
 					je			.eq
 
 					mov			rax,				r11
+					xor			rdx,				rdx
 					mov			r11,				256
 					mul			r11
 					add			rax,				r12

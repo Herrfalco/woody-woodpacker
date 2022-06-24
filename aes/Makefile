@@ -1,6 +1,5 @@
 SRCS	=	aes.c \
-			aes_fd.c \
-			aes_utils.c
+			aes_fd.c
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie

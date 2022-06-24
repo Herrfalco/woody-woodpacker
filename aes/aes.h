@@ -6,12 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:12:22 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 10:56:54 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:51:04 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef AES_H
 #define AES_H
+
+#include "../includes.h"
 
 #define KEY_SIZE		256		// 128 | 192 | 256 (must update key_sz in round_keys_asm.asm)
 #define RKEY_MAX_NB		60		// (must update rkey_arr_sz in aes_fd_dec.asm)

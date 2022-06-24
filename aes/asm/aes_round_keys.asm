@@ -21,11 +21,13 @@ round_keys_asm:
 
 					mov			rdi,				qword[key_size] 	; compute rkeys_nb (+4)
 					call		get_rnb_asm								;
-					mov			rdx,				4					;
-					mul			rdx										;
+					xor			rdx,				rdx
+					mov			rbx,				4					;
+					mul			rbx										;
 					mov			byte[rsp+4],		al					;
 
 					mov			rax,				qword[key_size]		; compute n (+5)
+					xor			rdx,				rdx					;
 					mov			rbx,				32					;
 					div			rbx										;
 					mov			byte[rsp+5],		al					;

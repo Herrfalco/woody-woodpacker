@@ -9,6 +9,7 @@ sub_bytes_asm:
 					mov			rbx,			s_box
 					mov			rax,			rsi
 					mov			r8,				256
+					xor			rdx,			rdx
 					mul			r8
 					lea			rdx,			[rbx+rax]
 

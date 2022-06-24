@@ -6,12 +6,14 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 16:06:58 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/21 13:33:56 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:53:16 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef AES_ASM_H
 #define AES_ASM_H
+
+#include "../includes.h"
 
 extern void			decode_block_asm(uint8_t *block, uint32_t *rkeys, uint8_t rnb);
 extern void			sub_bytes_asm(uint8_t *block, method_t type);

@@ -5,9 +5,10 @@ add_rkeys_asm:
 					push		rbp
 					mov			rbp,				rsp
 					mov			rax,				rdx
-					mov			rdx,				4
+					xor			rdx,				rdx
+					mov			rbx,				4
 					
-					mul			rdx
+					mul			rbx
 					xor			rcx,				rcx
 	.loop:
 					cmp			rcx,				4
