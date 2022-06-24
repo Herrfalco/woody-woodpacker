@@ -13,6 +13,7 @@ aes_fd_dec:
 
 					mov			rax,				qword[rkey_arr_sz]	;
 					mov			rbx,				4					;
+					; must set rdx to 0
 					mul			rbx										; r_keys	+1048
 					add			rax,				qword[buff_sz]		;
 					sub			rsp,				rax					; buff		+24

@@ -6,12 +6,11 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:56:24 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/24 14:21:22 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:54:05 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes.h"
-#include "aes_utils.h"
+#include "aes.h"
 #include "aes_asm.h"
 
 int				rand_key(uint8_t *buff, size_t size) {
