@@ -6,11 +6,11 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 16:53:36 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:17:01 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../utils/utils.h"
+#include "../../includes.h"
 #include "../../utils/utils_asm.h"
 #include "../../utils/test_utils.h"
 #include "../aes.h"
@@ -62,7 +62,7 @@ static int		file(char *file) {
 	aes_fd_enc(v_crypt, source, key);
 	aes_fd_dec(v_decrypt, crypt, key);
 
-	if (seek_asm(v_crypt, v_decrypt) || seek_asm(crypt, source))
+	if (seek_4_fd_asm(v_crypt, v_decrypt, crypt, source))
 		quit_4_fd_asm(v_crypt, v_decrypt, crypt, source, "can't seek into files");
 
 	printf("AES %s encoding: ", file);
@@ -90,10 +90,10 @@ int		main(void) {
 				|| (out = syscall(319, "v_file", 0)) < 0)
 			quit_asm("can't open virtual file");
 		aes_fd_enc(crypt, in, key);
-		if (seek_asm(crypt, 0))
+		if (seek_fd_asm(crypt))
 			quit_3_fd_asm(in, out, crypt, "can't seek into files");
 		aes_fd_dec(out, crypt, key);
-		if (seek_asm(in, out))
+		if (seek_2_fd_asm(in, out))
 			quit_3_fd_asm(in, out, crypt, "can't seek into files");
 		printf("AES random file (%ld bytes): ", i);
 		if ((diff = diff_v_files(in, out))) {

@@ -6,15 +6,14 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 14:57:43 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:16:19 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../utils/utils.h"
+#include "../includes.h"
 #include "../utils/utils_asm.h"
 #include "aes_utils.h"
 #include "aes_asm.h"
-#include "aes.h"
 
 void			aes_fd_enc(int fd_dst, int fd_src, uint8_t *key) {
 	uint8_t		buff[BUFF_SIZE] = { 0 };
@@ -25,7 +24,7 @@ void			aes_fd_enc(int fd_dst, int fd_src, uint8_t *key) {
 	size_t		i;
 
 	round_keys_asm(key, r_keys);
-	if ((src_sz = get_fd_size(fd_src)) < 0)
+	if ((src_sz = get_fd_size_asm(fd_src)) < 0)
 		quit_2_fd_asm(fd_src, fd_dst, "can't seek into source file");
 	if ((write_ret = write(fd_dst, &src_sz, 8)) < 8)
 		quit_2_fd_asm(fd_src, fd_dst, "can't write to destination file");

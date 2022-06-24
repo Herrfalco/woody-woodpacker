@@ -1,5 +1,18 @@
-#include "../includes.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unlzw.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
+/*   Updated: 2022/06/24 14:18:55 by fcadet           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "lzw.h"
+#include "../includes.h"
+#include "../utils/utils_asm.h"
 #include "../data_rw/data_rw.h"
 #include "asm/unlzw_asm.h"
 
@@ -9,7 +22,7 @@ static uint64_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 
 	init_dico(&dico);
 	if (value_reader(fd, &last_value, 9) < 0)
-		quit_2_fd(fd, new_fd, "can't read file");
+		quit_2_fd_asm(fd, new_fd, "can't read file");
 	file_writer(new_fd, last_value, NO_FLUSH);
 	if (*reset) {
 		*reset = 0;
@@ -45,9 +58,9 @@ void		unlzw(int fd) {
 	int			reset = 0;
 
 	if ((new_fd = open("uncompressed_file", O_WRONLY | O_TRUNC | O_CREAT, 0777)) == -1)
-		quit_fd(fd, "Can not create uncompressed file.");
+		quit_fd_asm(fd, "Can not create uncompressed file.");
 	lseek(fd, 0, SEEK_SET);
-	if (get_fd_size(fd) > 0)
+	if (get_fd_size_asm(fd) > 0)
 		while (unlzw_chunk(fd, new_fd, &reset) >= DICO_SIZE);
 	file_writer(new_fd, 0, ONLY_FLUSH);
 	close(fd);

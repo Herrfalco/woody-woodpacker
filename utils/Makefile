@@ -1,5 +1,4 @@
-SRCS	=	test_utils.c \
-			utils.c
+SRCS	=	test_utils.c
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie

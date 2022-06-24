@@ -6,11 +6,11 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/23 17:04:23 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/24 14:20:24 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.h"
+#include "../includes.h"
 #include "utils_asm.h"
 
 // A Supprimer
@@ -42,7 +42,7 @@ int				rand_v_file(int *file, uint64_t size) {
 	if (read_ret < 0)
 		return (close_ret(src, *file, -1, -1));
 	close(src);
-	return (seek_asm(*file, 0) ? -1 : 0);
+	return (seek_fd_asm(*file));
 }
 
 static int		bin_n_cmp(uint8_t *b1, uint8_t *b2, uint64_t size) {
@@ -56,8 +56,8 @@ int				diff_v_files(int f1, int f2) {
 	ssize_t		rd_ret_1, rd_ret_2;
 	uint64_t	size_1, size_2;
 
-	size_1 = get_fd_size(f1);
-	size_2 = get_fd_size(f2);
+	size_1 = get_fd_size_asm(f1);
+	size_2 = get_fd_size_asm(f2);
 	if (size_1 != size_2)
 		return (1);
 	for (; size_1 && (rd_ret_1 = read(f1, buff_1, BUFF_SIZE)) > 0
@@ -66,7 +66,7 @@ int				diff_v_files(int f1, int f2) {
 		rd_ret_1 = rd_ret_1 < BUFF_SIZE ? rd_ret_1 : BUFF_SIZE;
 		rd_ret_2 = rd_ret_2 < BUFF_SIZE ? rd_ret_2 : BUFF_SIZE;
 		if (rd_ret_1 != rd_ret_2 || bin_n_cmp(buff_1, buff_2, rd_ret_1))
-			return (seek_asm(f1, f2) ? -1 : 1);
+			return (seek_2_fd_asm(f1, f2) ? -1 : 1);
 	}
-	return ((seek_asm(f1, f2) || rd_ret_1 < 0 || rd_ret_2 < 0) ? -1 : 0);
+	return ((seek_2_fd_asm(f1, f2) || rd_ret_1 < 0 || rd_ret_2 < 0) ? -1 : 0);
 }

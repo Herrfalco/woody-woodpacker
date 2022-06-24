@@ -17,19 +17,18 @@ quit_4_fd_asm:
 					push		rcx				; fd_4	+8
 					push		r8				; msg	+0
 
-
 					mov			r9,				1
-	.loop
+	.loop:
 					cmp			r9,				5
 					je			.msg
 
 					mov			rdi,			qword[rsp+r9*8]
 					cmp			rdi,			0
-					je			.inc
+					jl			.inc
 
 					mov			rax,			3
 					syscall
-	.inc
+	.inc:
 					inc			r9
 					jmp			.loop
 	.msg:
@@ -71,7 +70,7 @@ quit_3_fd_asm:
 					mov			rbp,			rsp
 
 					mov			r8,				rcx
-					xor			rcx,			rcx
+					mov			rcx,			-1
 					call		quit_4_fd_asm
 
 					mov			rsp,			rbp
@@ -83,7 +82,7 @@ quit_2_fd_asm:
 					mov			rbp,			rsp
 
 					mov			rcx,			rdx
-					xor			rdx,			rdx
+					mov			rdx,			-1
 					call		quit_3_fd_asm
 
 					mov			rsp,			rbp
@@ -95,7 +94,7 @@ quit_fd_asm:
 					mov			rbp,			rsp
 
 					mov			rdx,			rsi
-					xor			rsi,			rsi
+					mov			rsi,			-1
 					call		quit_2_fd_asm
 
 					mov			rsp,			rbp
@@ -107,7 +106,7 @@ quit_asm:
 					mov			rbp,			rsp
 
 					mov			rsi,			rdi
-					xor			rdi,			rdi
+					mov			rdi,			-1
 					call		quit_fd_asm
 
 					mov			rsp,			rbp

@@ -1,7 +1,8 @@
 SRCS	=	str_len.asm \
 			quit.asm \
 			sat_sub.asm \
-			seek.asm
+			seek.asm \
+			get_fd_size.asm
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm
 CFLAGS	=	-felf64

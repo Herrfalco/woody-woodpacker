@@ -1,5 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main_test.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
+/*   Updated: 2022/06/24 14:19:21 by fcadet           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes.h"
-#include "../test_utils.h"
+#include "../utils/utils_asm.h"
+#include "../utils/test_utils.h"
 #include "lzw.h"
 
 int				main(int ac, char **av) {
@@ -7,18 +20,18 @@ int				main(int ac, char **av) {
 	int	new_fd = 0;
 
 	if (ac != 2)
-		quit("1 arg needed to set fd size");
+		quit_asm("1 arg needed to set fd size");
 //	rand_v_file(&fd, atoi(av[1]));
 	if ((fd = open(av[1], O_RDONLY)) == -1)
 		return (0);
 	new_fd = lzw(fd);
-	printf("%ld\n", get_fd_size(new_fd));
+	printf("%ld\n", get_fd_size_asm(new_fd));
 	unlzw(new_fd);
 	if ((new_fd = open("uncompressed_file", O_RDONLY)) == -1)
-		quit("can't open uncompressed file");
+		quit_asm("can't open uncompressed file");
 	if (diff_v_files(fd, new_fd))
-		quit_2_fd(fd, new_fd, "files are differents");
+		quit_2_fd_asm(fd, new_fd, "files are differents");
 	else
-		quit_2_fd(fd, new_fd, "files are equals");
+		quit_2_fd_asm(fd, new_fd, "files are equals");
 	return (0);
 }

@@ -1,5 +1,18 @@
-#include "../includes.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lzw.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/24 14:17:16 by fcadet            #+#    #+#             */
+/*   Updated: 2022/06/24 14:18:06 by fcadet           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "lzw.h"
+#include "../includes.h"
+#include "../utils/utils_asm.h"
 #include "../data_rw/data_rw.h"
 
 static uint64_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz, uint8_t *nb_bits) {
@@ -10,7 +23,7 @@ static uint64_t		lzw_chunk(int fd, int new_fd, int64_t *file_sz, uint8_t *nb_bit
 	last_byte = 0;
 	init_dico(&dico);
 	if (file_reader(fd, (uint8_t *)&last_byte) < 0)
-		quit_2_fd(fd, new_fd, "can't read file");
+		quit_2_fd_asm(fd, new_fd, "can't read file");
 	for (; *file_sz && file_reader(fd, (uint8_t *)&byte) > 0
 			&& dico.size < DICO_SIZE;
 			--*file_sz) {
@@ -41,9 +54,9 @@ int			lzw(int fd) {
 	uint8_t nb_bits = 0;
 	
 	if ((new_fd = syscall(319, "tmp.lzw", 0)) == -1)
-		quit_fd(fd, "Can not create memfd.");
-	if ((file_sz = get_fd_size(fd)) < 0)
-		quit_fd(fd, "can't get file size");
+		quit_fd_asm(fd, "Can not create memfd.");
+	if ((file_sz = get_fd_size_asm(fd)) < 0)
+		quit_fd_asm(fd, "can't get file size");
 	lseek(fd, 0, SEEK_SET);
 	while (file_sz && lzw_chunk(fd, new_fd, &file_sz, &nb_bits) >= DICO_SIZE);
 	value_writer(new_fd, STOP_CODE, nb_bits, NO_FLUSH);

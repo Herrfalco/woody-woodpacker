@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   includes.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
+/*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/09 11:54:11 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/23 15:45:14 by fcadet           ###   ########.fr       */
+/*   Created: 2022/06/24 14:13:09 by fcadet            #+#    #+#             */
+/*   Updated: 2022/06/24 14:13:46 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.h"
+#ifndef INCLUDES_H
+#define INCLUDES_H
 
-int64_t			get_fd_size(int fd) {
-	ssize_t	size;
+#include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-	if ((size = lseek(fd, 0, SEEK_END)) < 0 || lseek(fd, 0, SEEK_SET) < 0)
-		return (-1);
-	return (size);
-}
+#define BUFF_SIZE		1024	// (must update buff_sz in aes_fd_dec.asm)
+
+#endif // INCLUDES_H

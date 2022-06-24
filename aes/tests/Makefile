@@ -5,11 +5,11 @@ AES		=	../aes.o \
 			../aes_fd.o \
 			../aes_utils.o \
 			../../utils/test_utils.o \
-			../../utils/utils.o \
 			../../utils/asm/str_len.o \
 			../../utils/asm/quit.o \
 			../../utils/asm/sat_sub.o \
 			../../utils/asm/seek.o \
+			../../utils/asm/get_fd_size.o \
 			../asm/aes_decode_bloc.o \
 			../asm/aes_sub.o \
 			../asm/aes_shift.o \
