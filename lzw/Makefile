@@ -3,9 +3,13 @@ SRCS	=	lzw.c \
 			unlzw.c \
 			dico.c \
 			main_test.c \
-			../utils.c \
 			../data_rw/data_rw.c \
-			../test_utils.c
+
+ASM		=	new_entry.o \
+			not_in_dico.o \
+			../utils/asm/get_fd_size.o \
+			../utils/asm/quit.o \
+			../utils/asm/sat_sub.o
 
 OBJS	=	$(SRCS:.c=.o)
 
@@ -20,6 +24,8 @@ test	:	all
 all	:	$(NAME)
 
 $(NAME)	:	$(OBJS)
+		make -C ../utils
+		make -C asm
 		$(CC) $(CFLAGS) $^ -o $@
 
 %.o	:	%.c
@@ -29,6 +35,7 @@ clean	:
 		$(RM) $(OBJS)
 
 fclean	:	clean
+		make -C asm fclean
 		$(RM) $(NAME)
 
 re	:	fclean all

@@ -9,6 +9,7 @@
 # define DICO_START	259
 # define MAX_BYTE	255
 
+# include "../includes.h"
 
 struct			s_dico {
 	uint64_t	size;
