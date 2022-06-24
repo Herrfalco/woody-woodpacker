@@ -21,7 +21,7 @@ new_entry_asm:
 					inc			qword[r11]
 					jmp			.end
 
-		.comp
+		.comp:
 					cmp			r9,				rdi
 					jne			.incr
 
