@@ -6,7 +6,7 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/25 13:13:47 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 18:01:03 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,20 @@ void	encrypt_files(char *file) {
 
 	sprintf(buff, "files/%s", file);
 	if ((crypt = open(buff, O_WRONLY | O_TRUNC | O_CREAT, 0666)) < 0)
-		quit("can't open destination file");
+		quit_asm("can't open destination file");
 	sprintf(buff, "/usr/bin/%s", file);
 	if ((source = open(buff, O_RDONLY)) < 0)
-		quit_fd(crypt, "can't open source file");
+		quit_fd_asm(crypt, "can't open source file");
 
-	aes_fd(crypt, source, key, ENCODE);
+	aes_fd_enc(crypt, source, key);
 	close_ret(crypt, source, -1, 0);
 }
 
 int		main(void) {
-	char		*files[5] = { "zip", "top", "touch", "apt-get", "ssh" };
+	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
+		"sort", "sed", "pwd", "ps", "less" };
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 10; ++i)
 		encrypt_files(files[i]);
 	return (0);
 }
@@ -76,11 +77,12 @@ static int		file(char *file) {
 
 int		main(void) {
 	int			in, crypt, out, diff;
-	char		*files[5] = { "zip", "top", "touch", "apt-get", "ssh" };
+	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
+		"sort", "sed", "pwd", "ps", "less" };
 	uint8_t		key[KEY_SIZE];
 	uint64_t	i;
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
 	for (i = 0; i < 100000000; i += i * 2 + 1) {

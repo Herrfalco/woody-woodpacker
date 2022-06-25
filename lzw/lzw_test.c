@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_test.c                                        :+:      :+:    :+:   */
+/*   lzw_test.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 16:39:46 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 17:57:37 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,12 @@ static int		file(char *file) {
 int				main(void) {
 	int			in = 0;
 	int			crypt, out, diff;
-	char		*files[5] = { "zip", "top", "touch", "apt-get", "ssh" };
+	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
+		"sort", "sed", "pwd", "ps", "less" };
 	uint64_t	a_size, b_size;
 	uint64_t	i;
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
 	for (i = 0; i < 10000000; i += i * 2 + 1) {
