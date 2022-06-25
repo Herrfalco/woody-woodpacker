@@ -23,6 +23,8 @@ static uint64_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 	init_dico(&dico);
 	if (value_reader(fd, &last_value, 9) < 0)
 		quit_2_fd_asm(fd, new_fd, "can't read file");
+	if (last_value == STOP_CODE)
+		return (0);
 	file_writer(new_fd, last_value, NO_FLUSH);
 	if (*reset) {
 		*reset = 0;
@@ -40,10 +42,14 @@ static uint64_t	unlzw_chunk(int fd, int new_fd, int *reset) {
 		else if (value == STOP_CODE)
 			return (0);
 		else if (value >= DICO_START) {
-			if (value >= dico.size + DICO_START)
+			if (value >= dico.size + DICO_START) {
 				not_in_dico(last_value, &dico);
-			first = entry_writer(new_fd, value, &dico);
-			new_entry(last_value, first, &dico);
+				entry_writer(new_fd, value, &dico);
+			}
+			else {
+				first = entry_writer(new_fd, value, &dico);
+				new_entry(last_value, first, &dico);
+			}
 		}
 		else {
 			file_writer(new_fd, value, NO_FLUSH);

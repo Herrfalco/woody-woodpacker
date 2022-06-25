@@ -1,7 +1,7 @@
 #ifndef COMPR_H
 # define COMPR_H
 
-# define DICO_SIZE	3837
+# define DICO_SIZE	3834
 # define BUFF_SIZE	1024
 # define RESET_CODE	256
 # define STOP_CODE	257

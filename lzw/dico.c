@@ -31,11 +31,6 @@ int				get_bits_nb(uint64_t dico_size) {
 }
 
 void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
-	uint64_t	i;
-
-	for (i = 0; i < dico->size; ++i)
-		if (dico->entry[i][0] == last_byte && dico->entry[i][1] == byte)
-			return ;
 	dico->entry[dico->size][0] = last_byte;
 	dico->entry[dico->size][1] = byte;
 	++dico->size;

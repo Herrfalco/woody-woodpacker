@@ -21,9 +21,8 @@ int				main(int ac, char **av) {
 
 	if (ac != 2)
 		quit_asm("1 arg needed to set fd size");
-//	rand_v_file(&fd, atoi(av[1]));
-	if ((fd = open(av[1], O_RDONLY)) == -1)
-		return (0);
+//	fd = open(av[1], O_RDONLY);
+	rand_v_file(&fd, atoi(av[1]));
 	new_fd = lzw(fd);
 	printf("%ld\n", get_fd_size_asm(new_fd));
 	unlzw(new_fd);

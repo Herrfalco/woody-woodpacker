@@ -64,4 +64,3 @@ int			lzw(int fd) {
 //	close(fd);
 	return (new_fd);
 }
-
