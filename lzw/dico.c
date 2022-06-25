@@ -6,12 +6,11 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:21 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 16:57:49 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 17:40:35 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lzw.h"
-#include "data_rw.h"
 #include "../includes.h"
 
 int				get_bits_nb(uint64_t dico_size) {
@@ -40,16 +39,16 @@ int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 	return (-1);
 }
 
-uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico) {
+uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff) {
 	uint16_t	ret;
 
 	if (dico->entry[value - DICO_START][0] >= DICO_START)
-		ret = entry_writer(fd, dico->entry[value - DICO_START][0], dico);
+		ret = entry_writer(fd, dico->entry[value - DICO_START][0], dico, buff);
 	else {
-		file_writer(fd, dico->entry[value - DICO_START][0], NO_FLUSH);
+		file_writer(fd, dico->entry[value - DICO_START][0], NO_FLUSH, buff);
 		ret = dico->entry[value - DICO_START][0];
 	}
-	file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH);
+	file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff);
 	return (ret);
 }
 
