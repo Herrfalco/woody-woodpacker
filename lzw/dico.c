@@ -6,13 +6,13 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:21 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 14:22:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:57:49 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lzw.h"
+#include "data_rw.h"
 #include "../includes.h"
-#include "../data_rw/data_rw.h"
 
 int				get_bits_nb(uint64_t dico_size) {
 	if (dico_size < 253)

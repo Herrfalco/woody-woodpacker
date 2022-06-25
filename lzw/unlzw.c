@@ -6,14 +6,14 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 15:12:48 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:57:26 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lzw.h"
+#include "data_rw.h"
 #include "../includes.h"
 #include "../utils/utils_asm.h"
-#include "../data_rw/data_rw.h"
 #include "asm/unlzw_asm.h"
 
 static uint64_t	unlzw_chunk(int dst, int src, int *reset, b_buff_t *fr_buff, dw_buff_t *vr_buff) {

@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/24 14:20:24 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:27:33 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ int				close_ret(int f1, int f2, int f3, int ret) {
 
 int				rand_v_file(int *file, uint64_t size) {
 	int			src = open("/dev/urandom", O_RDONLY);
-	uint8_t		buff[BUFF_SIZE];
-	ssize_t		read_ret, write_size;
+	uint8_t		buff[BUFF_SIZE] = { 0 };
+	ssize_t		read_ret = 0, write_size = 0;
 
 	if (src < 0)
 		return (-1);
@@ -51,9 +51,9 @@ static int		bin_n_cmp(uint8_t *b1, uint8_t *b2, uint64_t size) {
 }
 
 int				diff_v_files(int f1, int f2) {
-	uint8_t		buff_1[BUFF_SIZE];
-	uint8_t		buff_2[BUFF_SIZE];
-	ssize_t		rd_ret_1, rd_ret_2;
+	uint8_t		buff_1[BUFF_SIZE] = { 0 };
+	uint8_t		buff_2[BUFF_SIZE] = { 0 };
+	ssize_t		rd_ret_1 = 0, rd_ret_2 = 0;
 	uint64_t	size_1, size_2;
 
 	size_1 = get_fd_size_asm(f1);

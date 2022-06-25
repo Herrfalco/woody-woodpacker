@@ -6,17 +6,18 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/25 15:06:10 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:10:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
+#include "../utils/utils_asm.h"
 #include "data_rw.h"
 
 int		file_writer(int fd, uint8_t byte, flush_t flush) {
-	static uint8_t		buff[BUFF_SIZE];
+	static uint8_t		buff[BUFF_SIZE] = { 0 };
 	static ssize_t		buff_len = 0;
-	
+
 	if (flush != ONLY_FLUSH)
 		buff[buff_len++] = byte;
 	if (flush || buff_len == BUFF_SIZE) {
@@ -48,7 +49,7 @@ int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
 		if (file_writer(fd, buff >> 24, buff_len <= 8 ? flush : NO_FLUSH) < 0)
 			return (-1);
 		buff <<= 8;
-		buff_len = buff_len < 8 ? 0 : buff_len - 8;
+		buff_len = sat_sub_asm(buff_len, 8);
 	}
 	return (buff_len);
 }

@@ -6,21 +6,21 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:17:16 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 15:10:07 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:57:15 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lzw.h"
+#include "data_rw.h"
 #include "../includes.h"
 #include "../utils/utils_asm.h"
-#include "../data_rw/data_rw.h"
 
 static uint64_t		lzw_chunk(int dst, int src, int64_t *file_sz, uint8_t *nb_bits, b_buff_t *buff) {
 	t_dico		dico = {
 		.size = 0,
 		.bits = 9,
 	};
-	uint16_t	byte;
+	uint16_t	byte = 0;
 	uint16_t	last_byte = 0;
 	int64_t		i;
 

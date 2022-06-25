@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/25 13:10:11 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 16:50:01 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 
 void			aes_fd_enc(int fd_dst, int fd_src, uint8_t *key) {
 	uint8_t		buff[BUFF_SIZE] = { 0 };
-	uint32_t	r_keys[RKEY_MAX_NB];
-	ssize_t		read_ret, write_ret;
-	int64_t		src_sz;
+	uint32_t	r_keys[RKEY_MAX_NB] = { 0 };
+	ssize_t		read_ret = 0, write_ret = 0;
+	int64_t		src_sz = 0;
 	uint64_t	data_sz;
 	size_t		i;
 

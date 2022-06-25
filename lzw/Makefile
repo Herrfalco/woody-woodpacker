@@ -2,8 +2,8 @@ NAME	=	lzw_test
 SRCS	=	lzw.c \
 			unlzw.c \
 			dico.c \
-			main_test.c \
-			../data_rw/data_rw.c \
+			lzw_test.c \
+			data_rw.c \
 			../utils/test_utils.o
 
 ASM		=	asm/new_entry.o \
@@ -16,30 +16,28 @@ ASM		=	asm/new_entry.o \
 
 OBJS	=	$(SRCS:.c=.o)
 
-CC	=	gcc
+CC		=	gcc
 
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
 
-RM	=	rm -rf
+RM		=	rm -rf
 
-test	:	all
-
-all	:	$(NAME)
+all		:	$(NAME)
 
 $(NAME)	:	$(OBJS)
-		make -C ../utils
-		make -C asm
-		$(CC) $(CFLAGS) $^ $(ASM) -o $@
+			make -C ../utils
+			make -C asm
+			$(CC) $(CFLAGS) $^ $(ASM) -o $@
 
-%.o	:	%.c
-		$(CC) $(CFLAGS) -c $< -o $@
+%.o		:	%.c
+			$(CC) $(CFLAGS) -c $< -o $@
 
 clean	:
-		$(RM) $(OBJS)
+			$(RM) $(OBJS)
 
 fclean	:	clean
-		make -C ../utils fclean
-		make -C asm fclean
-		$(RM) $(NAME)
+			make -C ../utils fclean
+			make -C asm fclean
+			$(RM) $(NAME)
 
-re	:	fclean all
+re		:	fclean all
