@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/16 14:21:25 by herrfalco        ###   ########.fr       */
+/*   Updated: 2022/06/25 15:06:10 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,14 @@ int		file_writer(int fd, uint8_t byte, flush_t flush) {
 	return (buff_len);
 }
 
-int		file_reader(int fd, uint8_t *byte) {
-	static uint8_t		buff[BUFF_SIZE];
-	static ssize_t		buff_size = 0;
-	static ssize_t		buff_idx = 0;
-
-	if (buff_idx == buff_size) {
-		buff_idx = 0;
-		if ((buff_size = read(fd, buff, BUFF_SIZE)) < 1)
-			return (buff_size);
+int		file_reader(int fd, uint8_t *byte, b_buff_t *buff) {
+	if (buff->idx == buff->size) {
+		buff->idx = 0;
+		if ((buff->size = read(fd, buff, BUFF_SIZE)) < 1)
+			return (buff->size);
 	}
-	*byte = buff[buff_idx];
-	return (buff_size - (buff_idx++));
+	*byte = buff->data[buff->idx];
+	return (buff->size - buff->idx++);
 }
 
 int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
@@ -57,27 +53,22 @@ int		value_writer(int fd, uint16_t value, size_t size, flush_t flush) {
 	return (buff_len);
 }
 
-int		value_reader(int fd, uint16_t *value, size_t size) {
-	static uint32_t		buff = 0;
-	static size_t		buff_size = 0;
+int		value_reader(int fd, uint16_t *value, size_t size, dw_buff_t *vr_buff, b_buff_t *fr_buff) {
 	int					read_ret;
 	uint8_t				byte;
 	uint16_t			mask = ((uint16_t)~0) >> (16 - size);
 
-	while (buff_size <= 24 && (read_ret = file_reader(fd, &byte)) > 0) {
-		buff <<= 8;
-		buff |= byte;
-		buff_size += 8;
+	while (vr_buff->size <= 24 && (read_ret = file_reader(fd, &byte, fr_buff)) > 0) {
+		vr_buff->data <<= 8;
+		vr_buff->data |= byte;
+		vr_buff->size += 8;
 	}
 	if (read_ret < 0)
 		return (read_ret);
-	if (buff_size >= size) {
-		buff_size -= size;
-		*value = (buff >> buff_size) & mask;
+	if (vr_buff->size >= size) {
+		vr_buff->size -= size;
+		*value = (vr_buff->data >> vr_buff->size) & mask;
 		return (1);
-	} else {
-		buff = 0;
-		buff_size = 0;
+	} else
 		return (0);
-	}
 }

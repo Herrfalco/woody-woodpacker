@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:21 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/24 14:18:36 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 14:22:33 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,8 @@
 #include "../includes.h"
 #include "../data_rw/data_rw.h"
 
-void			init_dico(t_dico *dico) {
-	dico->size = 0;
-	dico->bits = 9;
-}
-
 int				get_bits_nb(uint64_t dico_size) {
-	if (dico_size < 258)
+	if (dico_size < 253)
 		return (9);
 	else if (dico_size < 765)
 		return (10);
@@ -41,8 +36,8 @@ int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 
 	for (i = 0; i < dico->size; ++i)
 		if (last_value == dico->entry[i][0] && value == dico->entry[i][1])
-			return (i + 1);
-	return (0);
+			return (i);
+	return (-1);
 }
 
 uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico) {

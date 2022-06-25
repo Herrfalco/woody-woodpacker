@@ -26,7 +26,7 @@ int			check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
 uint16_t	entry_writer(int fd, uint16_t value, t_dico *dico);
 void		not_in_dico(uint16_t last_value, t_dico *dico);
 
-int			lzw(int fd);
-void		unlzw(int fd);
+void		lzw(int dst, int src);
+void		unlzw(int dst, int src);
 
 #endif
