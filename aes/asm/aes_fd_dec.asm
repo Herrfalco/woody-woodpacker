@@ -56,7 +56,7 @@ aes_fd_dec_asm:
 					mov			rax,				qword[buff_sz]
 					mov			rbx,				qword[rsp+8]
 					cmp			rbx,				rax
-					jg			.max_sz
+					ja			.max_sz
 
 					mov			qword[rsp],			rbx
 					jmp			.after_max_sz

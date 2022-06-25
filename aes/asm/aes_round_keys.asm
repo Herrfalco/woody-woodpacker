@@ -46,7 +46,7 @@ round_keys_asm:
 					mov			qword[rsp+16],		rbx					;
 
 					cmp			cl,					byte[rsp+5]			; i < n
-					jge			.case_2									;
+					jae			.case_2									;
 
 					mov			rax,				qword[rsp+40]		; rkeys[i] = (32)key[i]
 					mov			eax,				dword[rax+rcx*4]	;
@@ -102,8 +102,8 @@ round_keys_asm:
 	.case_3:
 					cmp			ah,					4					; i % n == 4
 					jne			.case_4									;
-					cmp			byte[rsp+5],		6					;
-					jle			.case_4									;
+					cmp			byte[rsp+5],		6					; n > 6
+					jbe			.case_4									;
 
 					mov			rdi,				rsp					; sub_word_asm(tmp)
 					call		sub_word_asm							;

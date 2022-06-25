@@ -7,7 +7,7 @@ sat_sub_asm:
 
 					xor			rax,			rax
 					cmp			rdi,			rsi
-					jl			.end
+					jb			.end
 
 					sub			rdi,			rsi
 					mov			rax,			rdi
