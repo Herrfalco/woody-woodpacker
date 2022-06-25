@@ -17,7 +17,8 @@ AES		=	../aes.o \
 			../asm/aes_mix_columns.o \
 			../asm/aes_data_dec.o \
 			../asm/aes_get_rnb.o \
-			../asm/aes_round_keys.o
+			../asm/aes_round_keys.o \
+			../asm/aes_fd_dec.o
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
 RM		=	rm -rf

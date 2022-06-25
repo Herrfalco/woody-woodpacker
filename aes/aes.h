@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:12:22 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/24 14:51:04 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 13:10:37 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "../includes.h"
 
-#define KEY_SIZE		256		// 128 | 192 | 256 (must update key_sz in round_keys_asm.asm)
+#define KEY_SIZE		256		// 128 | 192 | 256 (must update key_sz in aes_round_keys.asm and aes_fd_dec.asm)
 #define RKEY_MAX_NB		60		// (must update rkey_arr_sz in aes_fd_dec.asm)
 
 typedef enum		method_e {
@@ -28,6 +28,5 @@ void	round_keys(uint8_t *key, uint32_t *rkeys);
 
 void	aes_data_enc(uint8_t *data, uint64_t size, uint32_t *r_keys);
 void	aes_fd_enc(int fd_dst, int fd_src, uint8_t *key);
-void	aes_fd_dec(int fd_dst, int fd_src, uint8_t *key);
 
 #endif // AES_H

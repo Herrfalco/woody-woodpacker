@@ -6,11 +6,12 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/24 14:55:14 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 13:13:47 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../aes.h"
+#include "../aes_asm.h"
 #include "../../utils/utils_asm.h"
 #include "../../utils/test_utils.h"
 
@@ -59,7 +60,7 @@ static int		file(char *file) {
 		quit_3_fd_asm(v_crypt, v_decrypt, crypt, "can't open decrypted file");
 
 	aes_fd_enc(v_crypt, source, key);
-	aes_fd_dec(v_decrypt, crypt, key);
+	aes_fd_dec_asm(v_decrypt, crypt, key);
 
 	if (seek_4_fd_asm(v_crypt, v_decrypt, crypt, source))
 		quit_4_fd_asm(v_crypt, v_decrypt, crypt, source, "can't seek into files");
@@ -81,7 +82,8 @@ int		main(void) {
 
 	for (int i = 0; i < 5; ++i)
 		file(files[i]);
-	for (i = 0; i < 10000000; i += i * 2 + 1) {
+	printf("------------------------------------\n");
+	for (i = 0; i < 100000000; i += i * 2 + 1) {
 		if (rand_key(key, KEY_SIZE) < 0)
 			quit_asm("can't generate random key");
 		if (rand_v_file(&in, i) < 0
@@ -91,7 +93,7 @@ int		main(void) {
 		aes_fd_enc(crypt, in, key);
 		if (seek_fd_asm(crypt))
 			quit_3_fd_asm(in, out, crypt, "can't seek into files");
-		aes_fd_dec(out, crypt, key);
+		aes_fd_dec_asm(out, crypt, key);
 		if (seek_2_fd_asm(in, out))
 			quit_3_fd_asm(in, out, crypt, "can't seek into files");
 		printf("AES random file (%ld bytes): ", i);
