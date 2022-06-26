@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:37:21 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/25 16:50:01 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/25 18:18:39 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "aes_asm.h"
 #include "../utils/utils_asm.h"
 
-void			aes_fd_enc(int fd_dst, int fd_src, uint8_t *key) {
+void			aes_fd_enc(int64_t fd_dst, int64_t fd_src, uint8_t *key) {
 	uint8_t		buff[BUFF_SIZE] = { 0 };
 	uint32_t	r_keys[RKEY_MAX_NB] = { 0 };
 	ssize_t		read_ret = 0, write_ret = 0;

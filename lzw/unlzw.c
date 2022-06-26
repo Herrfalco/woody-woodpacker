@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 17:52:26 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/26 13:11:30 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,11 @@
 #include "asm/unlzw_asm.h"
 
 static uint64_t	unlzw_chunk(int dst, int src, int *reset, rw_buff_t *r_buff, rw_buff_t *w_buff) {
-	t_dico		dico = {
-		.size = 0,
-		.bits = 9,
-	};
+	t_dico		dico = { 0 };
 	uint16_t	value, last_value, first;
 
-	if (value_reader(src, &last_value, 9, r_buff) < 0)
+	dico.bits = 9;
+	if (value_reader(src, &last_value, 9, r_buff))
 		quit_2_fd_asm(src, dst, "can't read file");
 	if (last_value == STOP_CODE)
 		return (0);
@@ -31,8 +29,7 @@ static uint64_t	unlzw_chunk(int dst, int src, int *reset, rw_buff_t *r_buff, rw_
 		*reset = 0;
 		return (DICO_SIZE);
 	}
-	for (; value_reader(src, &value, dico.bits, r_buff) > 0;
-			last_value = value) {
+	for (; !value_reader(src, &value, dico.bits, r_buff); last_value = value) {
 		if (value == RESET_CODE) {
 			*reset = 1;
 			return (DICO_SIZE);

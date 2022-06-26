@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 17:57:37 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/26 12:20:43 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ static int		file(char *file) {
 
 	a_size = get_fd_size_asm(source);
 	b_size = get_fd_size_asm(v_crypt);
+
+	printf("%ld - %ld\n", a_size, b_size);
 
 	unlzw(v_decrypt, v_crypt);
 

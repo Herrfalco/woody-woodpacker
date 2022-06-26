@@ -23,6 +23,7 @@ struct			rw_buff_s {
 	uint64_t	idx;
 	uint32_t	dword;
 	uint64_t	dw_size;
+	uint8_t		error;
 }				__attribute__((packed));
 
 typedef struct	rw_buff_s		rw_buff_t;
@@ -35,10 +36,10 @@ struct			s_dico {
 
 typedef struct	s_dico		t_dico;
 
-int			file_reader(int fd, uint8_t *byte, rw_buff_t *buff);
-int			file_writer(int fd, uint8_t byte, flush_t flush, rw_buff_t *buff);
-int			value_writer(int fd, uint16_t value, size_t size, flush_t flush, rw_buff_t *buff);
-int			value_reader(int fd, uint16_t *value, size_t size, rw_buff_t *buff);
+int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff);
+int64_t		file_writer(int64_t fd, uint8_t byte, flush_t flush, rw_buff_t *buff);
+int64_t			value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, rw_buff_t *buff);
+int64_t			value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buff);
 
 void		init_dico(t_dico *dico);
 int			get_bits_nb(uint64_t dico_size);
