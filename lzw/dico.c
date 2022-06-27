@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:21 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/27 14:14:07 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 15:13:32 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,7 @@ int64_t			entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff) {
 		if (file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff))
 			return (-1);
 		return (ret);
-	}
-	else {
+	} else {
 		if (file_writer(fd, value, NO_FLUSH, buff))
 			return (-1);
 		return (value);
