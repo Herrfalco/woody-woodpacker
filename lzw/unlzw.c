@@ -15,7 +15,7 @@
 #include "../utils/utils_asm.h"
 #include "asm/asm.h"
 
-static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
+uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 		rw_buff_t *w_buff) {
 	t_dico		dico = { 0 };
 	uint16_t	value = 0, last_value = 0, init = 0;
@@ -52,7 +52,7 @@ static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 	quit_2_fd_asm(src, dst, "can't read from source file");
 	return (0);
 }
-
+/*
 void		unlzw(int64_t dst, int64_t src) {
 	rw_buff_t	r_buff = { 0 }, w_buff = { 0 };
 	int64_t		file_sz;
@@ -63,3 +63,4 @@ void		unlzw(int64_t dst, int64_t src) {
 		return;
 	while (unlzw_chunk(dst, src, &r_buff, &w_buff) != STOP_CODE);
 }
+*/

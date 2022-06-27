@@ -9,11 +9,13 @@ SRCS	=	lzw.c \
 ASM		=	asm/new_entry.o \
 			asm/find_first_pattern.o \
 			asm/entry_writer.o \
+			asm/unlzw.o \
 			../utils/asm/get_fd_size.o \
 			../utils/asm/seek.o \
 			../utils/asm/str_len.o \
 			../utils/asm/quit.o \
-			../utils/asm/sat_sub.o
+			../utils/asm/sat_sub.o \
+			../utils/asm/b_zero.o
 
 OBJS	=	$(SRCS:.c=.o)
 

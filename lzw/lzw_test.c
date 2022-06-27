@@ -14,6 +14,7 @@
 #include "../utils/utils_asm.h"
 #include "../utils/test_utils.h"
 #include "lzw.h"
+#include "asm/asm.h"
 
 static void		file(char *file) {
 	int64_t		a_size, b_size;
@@ -40,7 +41,7 @@ static void		file(char *file) {
 
 	if ((dst = syscall(319, "v_file", 0)) < 0)
 		quit_fd_asm(src, "can't open virtual file");
-	unlzw(dst, src);
+	unlzw_asm(dst, src);
 	close(src);
 
 	if (seek_fd_asm(dst) < 0)
@@ -80,7 +81,7 @@ static void		v_file(uint64_t size) {
 
 	if ((dst = syscall(319, "v_file", 0)) < 0)
 		quit_fd_asm(src, "can't open virtual file");
-	unlzw(dst, src);
+	unlzw_asm(dst, src);
 	close(src);
 
 	src = tmp;
