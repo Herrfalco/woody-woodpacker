@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/26 13:12:31 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/26 21:01:15 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, 
 	buff->dword |= ((uint32_t)(value & mask)) << (32 - size - buff->dw_size);
 	buff->dw_size += size;
 	while (buff->dw_size >= 8 || (flush && buff->dw_size > 0)) {
-		if (file_writer(fd, buff->dword >> 24, buff->dw_size <= 8 ? flush : NO_FLUSH, buff) < 0)
+		if (file_writer(fd, buff->dword >> 24, buff->dw_size <= 8 ? flush : NO_FLUSH, buff))
 			return (-1);
 		buff->dword <<= 8;
 		buff->dw_size = sat_sub_asm(buff->dw_size, 8);
@@ -73,6 +73,6 @@ int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buf
 		buff->dw_size -= size;
 		*value = (buff->dword >> buff->dw_size) & mask;
 		return (0);
-	} else
-		return (-1);
+	}
+	return (-1);
 }

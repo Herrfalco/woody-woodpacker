@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/26 13:11:30 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 02:46:04 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,54 +15,44 @@
 #include "../utils/utils_asm.h"
 #include "asm/unlzw_asm.h"
 
-static uint64_t	unlzw_chunk(int dst, int src, int *reset, rw_buff_t *r_buff, rw_buff_t *w_buff) {
+static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
+		rw_buff_t *w_buff) {
 	t_dico		dico = { 0 };
-	uint16_t	value, last_value, first;
+	uint16_t	value = 0, last_value = 0, init = 0, first;
 
 	dico.bits = 9;
-	if (value_reader(src, &last_value, 9, r_buff))
-		quit_2_fd_asm(src, dst, "can't read file");
-	if (last_value == STOP_CODE)
-		return (0);
-	file_writer(dst, last_value, NO_FLUSH, w_buff);
-	if (*reset) {
-		*reset = 0;
-		return (DICO_SIZE);
-	}
-	for (; !value_reader(src, &value, dico.bits, r_buff); last_value = value) {
-		if (value == RESET_CODE) {
-			*reset = 1;
-			return (DICO_SIZE);
-		}
-		else if (value == INCR_CODE) {
-			value = last_value;
-			++dico.bits;
-		}
-		else if (value == STOP_CODE)
-			return (0);
-		else if (value >= DICO_START) {
-			if (value >= dico.size + DICO_START) {
-				not_in_dico(last_value, &dico);
+	for (; !value_reader(src, &value, dico.bits, r_buff);
+			last_value = value, value = 0) {
+		if (!init) {
+			entry_writer(dst, value, &dico, w_buff);
+			init = 1;
+		} else {
+			if (value == INCR_CODE) {
+				++dico.bits;
+				value = last_value;
+			} else if (value == RESET_CODE || value == STOP_CODE) {
+				file_writer(dst, 0, ONLY_FLUSH, w_buff);
+				return (value);
+			} else if (value == dico.size + DICO_START) {
+				new_entry(last_value, find_first_pattern(last_value, &dico), &dico);
 				entry_writer(dst, value, &dico, w_buff);
-			}
-			else {
+			} else {
 				first = entry_writer(dst, value, &dico, w_buff);
 				new_entry(last_value, first, &dico);
 			}
 		}
-		else {
-			file_writer(dst, value, NO_FLUSH, w_buff);
-			new_entry(last_value, value, &dico);
-		}
 	}
-	return (dico.size);
+	quit_2_fd_asm(src, dst, "can't read from source file");
+	return (0);
 }
 
-void		unlzw(int dst, int src) {
+void		unlzw(int64_t dst, int64_t src) {
 	rw_buff_t	r_buff = { 0 }, w_buff = { 0 };
-	int			reset = 0;
+	int64_t		file_sz;
 
-	if (get_fd_size_asm(src) > 0)
-		while (unlzw_chunk(dst, src, &reset, &r_buff, &w_buff) >= DICO_SIZE);
-	file_writer(dst, 0, ONLY_FLUSH, &w_buff);
+	if ((file_sz = get_fd_size_asm(src)) < 0)
+		quit_2_fd_asm(dst, src, "can't get file size");
+	if (file_sz < 1)
+		return;
+	while (unlzw_chunk(dst, src, &r_buff, &w_buff) != STOP_CODE);
 }

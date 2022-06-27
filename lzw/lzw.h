@@ -1,13 +1,12 @@
 #ifndef COMPR_H
 # define COMPR_H
 
-# define DICO_SIZE	3834
+# define DICO_SIZE	3837
 # define BUFF_SIZE	1024
 # define RESET_CODE	256
 # define STOP_CODE	257
 # define INCR_CODE	258
 # define DICO_START	259
-# define MAX_BYTE	255
 
 # include "../includes.h"
 
@@ -30,7 +29,7 @@ typedef struct	rw_buff_s		rw_buff_t;
 
 struct			s_dico {
 	uint64_t	size;
-	uint16_t	entry[DICO_SIZE + 1][2];
+	uint16_t	entry[DICO_SIZE][2];
 	uint8_t		bits;
 }				__attribute__((packed));
 
@@ -44,11 +43,11 @@ int64_t			value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *bu
 void		init_dico(t_dico *dico);
 int			get_bits_nb(uint64_t dico_size);
 void		new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico);
-int			check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
+int64_t		check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
 uint16_t	entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff);
-void		not_in_dico(uint16_t last_value, t_dico *dico);
+uint16_t	find_first_pattern(uint16_t value, t_dico *dico);
 
-void		lzw(int dst, int src);
-void		unlzw(int dst, int src);
+void		lzw(int64_t dst, int64_t src);
+void		unlzw(int64_t dst, int64_t src);
 
 #endif

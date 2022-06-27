@@ -1,5 +1,4 @@
-SRCS	=	not_in_dico.asm \
-				new_entry.asm
+SRCS	=	new_entry.asm
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm
 CFLAGS	=	-felf64

@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:21 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 17:40:35 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 02:45:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ int				get_bits_nb(uint64_t dico_size) {
 		return (12);
 }
 
-void			new_entry(uint16_t last_byte, uint16_t byte, t_dico *dico) {
-	dico->entry[dico->size][0] = last_byte;
-	dico->entry[dico->size][1] = byte;
+void			new_entry(uint16_t last_value, uint16_t value, t_dico *dico) {
+	dico->entry[dico->size][0] = last_value;
+	dico->entry[dico->size][1] = value;
 	++dico->size;
 }
 
-int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
-	uint64_t	i;
+int64_t			check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
+	uint64_t		i;
 
 	for (i = 0; i < dico->size; ++i)
 		if (last_value == dico->entry[i][0] && value == dico->entry[i][1])
@@ -42,26 +42,17 @@ int				check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 uint16_t		entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff) {
 	uint16_t	ret;
 
-	if (dico->entry[value - DICO_START][0] >= DICO_START)
+	if (value >= DICO_START) {
 		ret = entry_writer(fd, dico->entry[value - DICO_START][0], dico, buff);
-	else {
-		file_writer(fd, dico->entry[value - DICO_START][0], NO_FLUSH, buff);
-		ret = dico->entry[value - DICO_START][0];
+		file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff);
+		return (ret);
+	} else {
+		file_writer(fd, value, NO_FLUSH, buff);
+		return (value);
 	}
-	file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff);
-	return (ret);
 }
 
-static uint16_t		find_first_pattern(uint16_t value, t_dico *dico) {
-	if (dico->entry[value - DICO_START][0] >= DICO_START)
-		return (find_first_pattern(dico->entry[value - DICO_START][0], dico));
-	else 
-		return (dico->entry[value - DICO_START][0]);
-}
-
-void			not_in_dico(uint16_t last_value, t_dico *dico) {
-	if (last_value <= MAX_BYTE)
-		new_entry(last_value, last_value, dico);
-	else
-		new_entry(last_value, find_first_pattern(last_value, dico), dico);
+uint16_t		find_first_pattern(uint16_t value, t_dico *dico) {
+	return (value >= DICO_START
+			? find_first_pattern(dico->entry[value - DICO_START][0], dico) : value);
 }

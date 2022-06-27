@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/26 12:20:43 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 02:39:40 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,11 @@ static int		file(char *file) {
 
 	lzw(v_crypt, source);
 
-	if (seek_2_fd_asm(v_decrypt, source))
-		quit_3_fd_asm(v_crypt, v_decrypt, source, "can't seek into files");
-	if (!diff_v_files(v_crypt, source))
-		quit_3_fd_asm(v_crypt, v_decrypt, source, "file is not compressed");
-
 	a_size = get_fd_size_asm(source);
 	b_size = get_fd_size_asm(v_crypt);
 
-	printf("%ld - %ld\n", a_size, b_size);
+	if (!diff_v_files(v_crypt, source))
+		quit_3_fd_asm(v_crypt, v_decrypt, source, "file is not compressed");
 
 	unlzw(v_decrypt, v_crypt);
 
