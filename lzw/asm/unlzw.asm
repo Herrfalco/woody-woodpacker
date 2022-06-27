@@ -1,5 +1,5 @@
 					global		unlzw_asm
-					extern		unlzw_chunk_asm
+					extern		unlzw_chunk
 					extern		get_fd_size_asm
 					extern		quit_2_fd_asm
 					extern		b_zero_asm
@@ -42,9 +42,9 @@ unlzw_asm:
 	.loop:
 					mov			rdi,				qword[rsp+2136]
 					mov			rsi,				qword[rsp+2128]
-					lea			rdx,				qword[rsp]
-					lea			rcx,				qword[rsp+1053]
-					call		unlzw_chunk_asm
+					lea			rdx,				[rsp]
+					lea			rcx,				[rsp+1053]
+					call		unlzw_chunk
 
 					cmp			rax,				qword[stop_code]
 					je			.end
