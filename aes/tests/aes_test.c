@@ -6,7 +6,7 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/27 03:05:14 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 13:45:07 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,99 +15,90 @@
 #include "../../utils/utils_asm.h"
 #include "../../utils/test_utils.h"
 
-#define KEY		"ckH1eMrBA0as6qabw352mxmP0Bxw76NB"
-
-/*
-void	encrypt_files(char *file) {
-	int			crypt, source;
-	uint8_t		key[] = KEY;
-	char		buff[1024];
-
-	sprintf(buff, "files/%s", file);
-	if ((crypt = open(buff, O_WRONLY | O_TRUNC | O_CREAT, 0666)) < 0)
-		quit_asm("can't open destination file");
-	sprintf(buff, "/usr/bin/%s", file);
-	if ((source = open(buff, O_RDONLY)) < 0)
-		quit_fd_asm(crypt, "can't open source file");
-
-	aes_fd_enc(crypt, source, key);
-	close_ret(crypt, source, -1, 0);
-}
-
-int		main(void) {
-	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
-		"sort", "sed", "pwd", "ps", "less" };
-
-	for (int i = 0; i < 10; ++i)
-		encrypt_files(files[i]);
-	return (0);
-}
-*/
-
-static int		file(char *file) {
-	int			v_crypt, v_decrypt, crypt, source;
-	uint8_t		key[] = KEY;
-	char		buff[1024];
-
-	if ((v_crypt = syscall(319, "v_file", 0)) < 0)
-		quit_asm("can't open virtual file");
-	if ((v_decrypt = syscall(319, "v_file", 0)) < 0)
-		quit_fd_asm(v_crypt, "can't open virtual file");
-	sprintf(buff, "files/%s", file);
-	if ((crypt = open(buff, O_RDONLY)) < 0)
-		quit_2_fd_asm(v_crypt, v_decrypt, "can't open crypted file");
-	sprintf(buff, "/usr/bin/%s", file);
-	if ((source = open(buff, O_RDONLY)) < 0)
-		quit_3_fd_asm(v_crypt, v_decrypt, crypt, "can't open decrypted file");
-
-	aes_fd_enc(v_crypt, source, key);
-	aes_fd_dec_asm(v_decrypt, crypt, key);
-
-	if (seek_4_fd_asm(v_crypt, v_decrypt, crypt, source))
-		quit_4_fd_asm(v_crypt, v_decrypt, crypt, source, "can't seek into files");
-
-	printf("AES %s encoding: ", file);
-	printf("%s\n", diff_v_files(v_crypt, crypt) ? "KO" : "OK");
-	printf("AES %s decoding: ", file);
-	printf("%s\n", diff_v_files(v_decrypt, source) ? "KO" : "OK");
-
-	close(source);
-	return (close_ret(v_crypt, v_decrypt, crypt, 0));
-}
-
-int		main(void) {
-	int			in, crypt, out, diff;
-	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
-		"sort", "sed", "pwd", "ps", "less" };
+static void		file(char *file) {
+	int			src, dst;
 	uint8_t		key[KEY_SIZE];
+	char		buff[1024];
+
+	if (rand_key(key, KEY_SIZE) < 0)
+		quit_asm("can't generate random key");
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_asm("can't open virtual file");
+	sprintf(buff, "/usr/bin/%s", file);
+	if ((src = open(buff, O_RDONLY)) < 0)
+		quit_fd_asm(dst, "can't open source file");
+
+	aes_fd_enc(dst, src, key);
+	close(src);
+	src = dst;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into source file");
+
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_fd_asm(src, "can't open virtual file");
+	aes_fd_dec_asm(dst, src, key);
+	close(src);
+
+	if (seek_fd_asm(dst) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+	if ((src = open(buff, O_RDONLY)) < 0)
+		quit_fd_asm(dst, "can't open source file");
+
+	printf("AES on %s: ", file);
+	printf("%s\n", diff_v_files(src, dst) ? "KO" : "OK");
+
+	close(src);
+	close(dst);
+}
+
+static void		v_file(uint64_t size) {
+	int			src, dst, tmp;
+	uint8_t		key[KEY_SIZE];
+
+	if (rand_key(key, KEY_SIZE) < 0)
+		quit_asm("can't generate random key");
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_asm("can't open virtual file");
+	if (rand_v_file(&src, size) < 0)
+		quit_fd_asm(dst, "can't open source file");
+
+	aes_fd_enc(dst, src, key);
+	tmp = src;
+	src = dst;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_fd_asm(src, "can't open virtual file");
+	aes_fd_dec_asm(dst, src, key);
+	close(src);
+
+	src = tmp;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+
+	if (size >= 1000000)
+		printf("AES on %.1lf MB: ", (double)size / 1000000.);
+	else if (size >= 1000)
+		printf("AES on %.1lf KB: ", (double)size / 1000.);
+	else
+		printf("AES on %ld bytes: ", size);
+	printf("%s\n", diff_v_files(src, dst) ? "KO" : "OK");
+
+	close(src);
+	close(dst);
+}
+
+int		main(void) {
+	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
+		"sort", "sed", "pwd", "ps", "less" };
 	uint64_t	i;
 
 	printf("------------------------------------\n");
-	for (int i = 0; i < 10; ++i)
+	for (i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
-	for (i = 0; i < 50000000; i += i * 2 + 1) {
-		if (rand_key(key, KEY_SIZE) < 0)
-			quit_asm("can't generate random key");
-		if (rand_v_file(&in, i) < 0
-				|| (crypt = syscall(319, "v_file", 0)) < 0
-				|| (out = syscall(319, "v_file", 0)) < 0)
-			quit_asm("can't open virtual file");
-		aes_fd_enc(crypt, in, key);
-		if (seek_fd_asm(crypt))
-			quit_3_fd_asm(in, out, crypt, "can't seek into files");
-		aes_fd_dec_asm(out, crypt, key);
-		if (seek_2_fd_asm(in, out))
-			quit_3_fd_asm(in, out, crypt, "can't seek into files");
-		printf("AES random file (%ld bytes): ", i);
-		if ((diff = diff_v_files(in, out))) {
-			if (diff < 0)
-				quit_asm("can't read files");
-			printf("KO\n");
-			return (close_ret(in, crypt, out, 0));
-		}
-		printf("OK\n");
-		close_ret(in, crypt, out, 0);
-	}
-	return (close_ret(in, crypt, out, 0));
+	for (i = 0; i < 5000000; i += i * 2 + 1)
+		v_file(i);
+	return (0);
 }
