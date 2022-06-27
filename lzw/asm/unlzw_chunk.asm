@@ -17,8 +17,8 @@ unlzw_chunk_asm:
 						push		rsi							; src			+15392
 						push		rdx							; *r_buff		+15384
 						push		rcx							; *w_buff		+15376
-																; entries_nb	+15371
-																; first			+15363
+																;
+																;
 																; init			+15361
 																; last_value	+15359
 																; value			+15357
@@ -31,10 +31,9 @@ unlzw_chunk_asm:
 						call		b_zero_asm
 
 						mov			byte[rsp+15356],	9
-						jmp			.loop
 
 	.loop:
-						mov			rdi,				qword[rsp+15400]
+						mov			rdi,				qword[rsp+15392]
 						lea			rsi,				[rsp+15357]
 						xor			rdx,				rdx
 						mov			dl,					byte[rsp+15356]
@@ -60,13 +59,10 @@ unlzw_chunk_asm:
 
 						xor			r8,					r8
 						mov			r8w,				word[rsp+15357]
-						xor			r9,					r9
 						mov			r9,					qword[dico_start]
 						add			r9,					qword[rsp]
 						cmp			r8,					r9
 						je			.in_dico
-
-						cmp			r8,					r9
 						ja			.corrupted
 						
 						mov			rdi,				qword[rsp+15400]
@@ -84,7 +80,6 @@ unlzw_chunk_asm:
 						mov			rsi,				rax
 						lea			rdx,				[rsp]
 						call		new_entry_asm
-
 
 		.init:
 						mov			rdi,				qword[rsp+15400]
@@ -111,11 +106,11 @@ unlzw_chunk_asm:
 						mov			rdi,				qword[rsp+15400]
 						xor			rsi,				rsi
 						mov			rdx,				2
-						mov			rcx,				qword[15376]
+						mov			rcx,				qword[rsp+15376]
 						call		file_writer
 
-						cmp			rax,				0
-						jne			.write_err
+						cmp			rax,				-1
+						je			.write_err
 
 						xor			rax,				rax
 						mov			ax,					word[rsp+15357]
@@ -141,34 +136,31 @@ unlzw_chunk_asm:
 						mov			rcx,				qword[rsp+15376]
 						call		entry_writer_asm
 
-						cmp			rax,				0
-						jl			.write_err
+						cmp			rax,				-1
+						je			.write_err
 
 						jmp			.end_of_loop
 
 		.end_of_loop:
-						xor			r8,					r8
 						mov			r8w,				word[rsp+15357]
 						mov			word[rsp+15359],	r8w
 						mov			word[rsp+15357],	0
 						jmp			.loop
 
 	.read_err:
-						mov			rdi,				qword[rsp+15392]
-						mov			rsi,				qword[rsp+15400]
 						mov			rdx,				read_err_msg
-						call		quit_2_fd_asm
+						jmp			.err
 
 	.write_err:
-						mov			rdi,				qword[rsp+15392]
-						mov			rsi,				qword[rsp+15400]
 						mov			rdx,				write_err_msg
-						call		quit_2_fd_asm
-					
+						jmp			.err
+
 	.corrupted:
+						mov			rdx,				corrupted_err_msg
+
+	.err:
 						mov			rdi,				qword[rsp+15392]
 						mov			rsi,				qword[rsp+15400]
-						mov			rdx,				corrupted_err_msg
 						call		quit_2_fd_asm
 
 	.end:

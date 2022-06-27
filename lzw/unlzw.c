@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/27 15:13:04 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 23:33:35 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "../utils/utils_asm.h"
 #include "asm/asm.h"
 
+/*
 uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 		rw_buff_t *w_buff) {
 	t_dico		dico = { 0 };
@@ -52,6 +53,7 @@ uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 	quit_2_fd_asm(src, dst, "can't read from source file");
 	return (0);
 }
+*/
 
 /*
 void		unlzw(int64_t dst, int64_t src) {
