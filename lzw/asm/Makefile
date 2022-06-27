@@ -1,5 +1,6 @@
 SRCS	=	new_entry.asm \
-			find_first_pattern.asm
+			find_first_pattern.asm \
+			entry_writer.asm
 
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm

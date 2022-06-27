@@ -42,7 +42,6 @@ int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buf
 
 int			get_bits_nb(uint64_t dico_size);
 int64_t		check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
-int64_t		entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff);
 
 void		lzw(int64_t dst, int64_t src);
 void		unlzw(int64_t dst, int64_t src);

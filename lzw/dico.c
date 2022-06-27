@@ -32,18 +32,3 @@ int64_t			check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 			return (i);
 	return (-1);
 }
-
-int64_t			entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff) {
-	int64_t		ret;
-
-	if (value >= DICO_START) {
-		ret = entry_writer(fd, dico->entry[value - DICO_START][0], dico, buff);
-		if (file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff))
-			return (-1);
-		return (ret);
-	} else {
-		if (file_writer(fd, value, NO_FLUSH, buff))
-			return (-1);
-		return (value);
-	}
-}

@@ -12,7 +12,7 @@ find_first_pattern_asm:
 	.loop:
 							mov			rax,						rdi
 							cmp			rdi,						qword[dico_start]
-							jl			.end
+							jb			.end
 
 							sub			rdi,						qword[dico_start]
 							mov			di,							word[rsi+rdi*4+8]

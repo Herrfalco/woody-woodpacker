@@ -25,7 +25,7 @@ static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 	for (; !value_reader(src, &value, dico.bits, r_buff);
 			last_value = value, value = 0) {
 		if (!init) {
-			if (entry_writer(dst, value, &dico, w_buff) < 0)
+			if (entry_writer_asm(dst, value, &dico, w_buff) < 0)
 				quit_2_fd_asm(src, dst, "can't write to destination file");
 			init = 1;
 		} else {
@@ -38,12 +38,12 @@ static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 				return (value);
 			} else if (value == dico.size + DICO_START) {
 				new_entry_asm(last_value, find_first_pattern_asm(last_value, &dico), &dico);
-				if (entry_writer(dst, value, &dico, w_buff) < 0)
+				if (entry_writer_asm(dst, value, &dico, w_buff) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
 			} else if (value > dico.size + DICO_START) {
 				quit_2_fd_asm(src, dst, "corrupted file");
 			} else {
-				if ((first = entry_writer(dst, value, &dico, w_buff)) < 0)
+				if ((first = entry_writer_asm(dst, value, &dico, w_buff)) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
 				new_entry_asm(last_value, first, &dico);
 			}
