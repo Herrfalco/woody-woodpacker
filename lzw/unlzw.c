@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:18:39 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/27 02:56:09 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 14:02:49 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 				new_entry(last_value, find_first_pattern(last_value, &dico), &dico);
 				if (entry_writer(dst, value, &dico, w_buff) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
+			} else if (value > dico.size + DICO_START) {
+				quit_2_fd_asm(src, dst, "corrupted file");
 			} else {
 				if ((first = entry_writer(dst, value, &dico, w_buff)) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
