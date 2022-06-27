@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/27 02:39:40 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 03:05:25 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,11 @@ int				main(void) {
 	uint64_t	a_size, b_size;
 	uint64_t	i;
 
+	printf("------------------------------------\n");
 	for (int i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
-	for (i = 0; i < 10000000; i += i * 2 + 1) {
+	for (i = 0; i < 5000000; i += i * 2 + 1) {
 		if (rand_v_file(&in, i) < 0
 				|| (crypt = syscall(319, "v_file", 0)) < 0
 				|| (out = syscall(319, "v_file", 0)) < 0)

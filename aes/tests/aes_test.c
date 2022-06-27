@@ -6,7 +6,7 @@
 /*   By: herrfalco <fcadet@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 13:08:18 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/25 18:01:03 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 03:05:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,11 @@ int		main(void) {
 	uint8_t		key[KEY_SIZE];
 	uint64_t	i;
 
+	printf("------------------------------------\n");
 	for (int i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
-	for (i = 0; i < 100000000; i += i * 2 + 1) {
+	for (i = 0; i < 50000000; i += i * 2 + 1) {
 		if (rand_key(key, KEY_SIZE) < 0)
 			quit_asm("can't generate random key");
 		if (rand_v_file(&in, i) < 0
