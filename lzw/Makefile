@@ -7,6 +7,7 @@ SRCS	=	lzw.c \
 			../utils/test_utils.o
 
 ASM		=	asm/new_entry.o \
+			asm/find_first_pattern.o \
 			../utils/asm/get_fd_size.o \
 			../utils/asm/seek.o \
 			../utils/asm/str_len.o \

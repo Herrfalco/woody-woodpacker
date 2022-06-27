@@ -24,12 +24,6 @@ int				get_bits_nb(uint64_t dico_size) {
 		return (12);
 }
 
-void			new_entry(uint16_t last_value, uint16_t value, t_dico *dico) {
-	dico->entry[dico->size][0] = last_value;
-	dico->entry[dico->size][1] = value;
-	++dico->size;
-}
-
 int64_t			check_dico(uint16_t last_value, uint16_t value, t_dico *dico) {
 	uint64_t		i;
 
@@ -47,14 +41,10 @@ int64_t			entry_writer(int fd, uint16_t value, t_dico *dico, rw_buff_t *buff) {
 		if (file_writer(fd, dico->entry[value - DICO_START][1], NO_FLUSH, buff))
 			return (-1);
 		return (ret);
-	} else {
+	}
+	else {
 		if (file_writer(fd, value, NO_FLUSH, buff))
 			return (-1);
 		return (value);
 	}
-}
-
-uint16_t		find_first_pattern(uint16_t value, t_dico *dico) {
-	return (value >= DICO_START
-			? find_first_pattern(dico->entry[value - DICO_START][0], dico) : value);
 }

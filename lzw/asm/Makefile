@@ -1,4 +1,6 @@
-SRCS	=	new_entry.asm
+SRCS	=	new_entry.asm \
+			find_first_pattern.asm
+
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm
 CFLAGS	=	-felf64
