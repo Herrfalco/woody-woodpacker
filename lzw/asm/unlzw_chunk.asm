@@ -80,6 +80,7 @@ unlzw_chunk_asm:
 						mov			rsi,				rax
 						lea			rdx,				[rsp]
 						call		new_entry_asm
+						jmp			.end_of_loop
 
 		.init:
 						mov			rdi,				qword[rsp+15400]

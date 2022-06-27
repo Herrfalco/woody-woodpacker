@@ -44,6 +44,5 @@ int			get_bits_nb(uint64_t dico_size);
 int64_t		check_dico(uint16_t last_value, uint16_t value, t_dico *dico);
 
 void		lzw(int64_t dst, int64_t src);
-uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff, rw_buff_t *w_buff);
 
 #endif

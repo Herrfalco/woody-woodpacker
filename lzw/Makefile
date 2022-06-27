@@ -1,6 +1,5 @@
 NAME	=	lzw_test
 SRCS	=	lzw.c \
-			unlzw.c \
 			dico.c \
 			lzw_test.c \
 			data_rw.c \
