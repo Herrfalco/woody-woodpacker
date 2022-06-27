@@ -28,23 +28,19 @@ static uint64_t	unlzw_chunk(int64_t dst, int64_t src, rw_buff_t *r_buff,
 			if (entry_writer(dst, value, &dico, w_buff) < 0)
 				quit_2_fd_asm(src, dst, "can't write to destination file");
 			init = 1;
-		}
-		else {
+		} else {
 			if (value == INCR_CODE) {
 				++dico.bits;
 				value = last_value;
-			}
-			else if (value == RESET_CODE || value == STOP_CODE) {
+			} else if (value == RESET_CODE || value == STOP_CODE) {
 				if (file_writer(dst, 0, ONLY_FLUSH, w_buff))
 					quit_2_fd_asm(src, dst, "can't write to destination file");
 				return (value);
-			}
-			else if (value == dico.size + DICO_START) {
+			} else if (value == dico.size + DICO_START) {
 				new_entry_asm(last_value, find_first_pattern_asm(last_value, &dico), &dico);
 				if (entry_writer(dst, value, &dico, w_buff) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
-			}
-			else {
+			} else {
 				if ((first = entry_writer(dst, value, &dico, w_buff)) < 0)
 					quit_2_fd_asm(src, dst, "can't write to destination file");
 				new_entry_asm(last_value, first, &dico);

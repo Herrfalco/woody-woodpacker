@@ -6,21 +6,18 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:25:00 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/25 16:27:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 13:46:25 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes.h"
 #include "utils_asm.h"
 
-// A Supprimer
-int				close_ret(int f1, int f2, int f3, int ret) {
+static int		close_ret(int f1, int f2, int ret) {
 	if (f1 > -1)
 		close(f1);
 	if (f2 > -1)
 		close(f2);
-	if (f3 > -1)
-		close(f3);
 	return (ret);
 }
 
@@ -32,15 +29,15 @@ int				rand_v_file(int *file, uint64_t size) {
 	if (src < 0)
 		return (-1);
 	if ((*file = syscall(319, "v_file", 0)) < 0)
-		return (close_ret(src, -1, -1, -1));
+		return (close_ret(src, -1, -1));
 	for (; size && (read_ret = read(src, buff, BUFF_SIZE)) > 0;
 			size = sat_sub_asm(size, read_ret)) {
 		write_size = size > (size_t)read_ret ? (size_t)read_ret : size;
 		if (write(*file, buff, write_size) != write_size)
-			return (close_ret(src, *file, -1, -1));
+			return (close_ret(src, *file, -1));
 	}
 	if (read_ret < 0)
-		return (close_ret(src, *file, -1, -1));
+		return (close_ret(src, *file, -1));
 	close(src);
 	return (seek_fd_asm(*file));
 }

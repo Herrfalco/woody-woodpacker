@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:19:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/27 03:05:25 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/27 13:40:48 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,72 +15,101 @@
 #include "../utils/test_utils.h"
 #include "lzw.h"
 
-static int		file(char *file) {
-	int			v_crypt, v_decrypt, source;
-	uint64_t	a_size, b_size;
+static void		file(char *file) {
+	int64_t		a_size, b_size;
+	int			src, dst;
 	char		buff[1024];
 
-	if ((v_crypt = syscall(319, "v_file", 0)) < 0)
+	if ((dst = syscall(319, "v_file", 0)) < 0)
 		quit_asm("can't open virtual file");
-	if ((v_decrypt = syscall(319, "v_file", 0)) < 0)
-		quit_fd_asm(v_crypt, "can't open virtual file");
 	sprintf(buff, "/usr/bin/%s", file);
-	if ((source = open(buff, O_RDONLY)) < 0)
-		quit_3_fd_asm(v_crypt, v_decrypt, source, "can't open source file");
+	if ((src = open(buff, O_RDONLY)) < 0)
+		quit_fd_asm(dst, "can't open source file");
 
-	lzw(v_crypt, source);
+	lzw(dst, src);
+	if ((a_size = get_fd_size_asm(src)) < 0)
+		quit_2_fd_asm(src, dst, "can't get source size");
+	if ((b_size = get_fd_size_asm(dst)) < 0)
+		quit_2_fd_asm(src, dst, "can't get destination size");
+	if (!diff_v_files(src, dst))
+		quit_2_fd_asm(src, dst, "file is not compressed");
+	close(src);
+	src = dst;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into source file");
 
-	a_size = get_fd_size_asm(source);
-	b_size = get_fd_size_asm(v_crypt);
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_fd_asm(src, "can't open virtual file");
+	unlzw(dst, src);
+	close(src);
 
-	if (!diff_v_files(v_crypt, source))
-		quit_3_fd_asm(v_crypt, v_decrypt, source, "file is not compressed");
-
-	unlzw(v_decrypt, v_crypt);
-
-	if (seek_2_fd_asm(v_decrypt, source))
-		quit_3_fd_asm(v_crypt, v_decrypt, source, "can't seek into files");
+	if (seek_fd_asm(dst) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+	if ((src = open(buff, O_RDONLY)) < 0)
+		quit_fd_asm(dst, "can't open source file");
 
 	printf("LZW on %s: ", file);
 	sprintf(buff, "OK (%+ld%%)", b_size * 100 / a_size - 100);
-	printf("%s\n", diff_v_files(v_decrypt, source) ? "KO" : buff);
+	printf("%s\n", diff_v_files(src, dst) ? "KO" : buff);
 
-	return (close_ret(v_crypt, v_decrypt, source, 0));
+	close(src);
+	close(dst);
 }
 
-int				main(void) {
-	int			in = 0;
-	int			crypt, out, diff;
+static void		v_file(uint64_t size) {
+	int64_t		a_size, b_size;
+	int			src, dst, tmp;
+	char		buff[1024];
+
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_asm("can't open virtual file");
+	if (rand_v_file(&src, size) < 0)
+		quit_fd_asm(dst, "can't open source file");
+
+	lzw(dst, src);
+	if ((a_size = get_fd_size_asm(src)) < 0)
+		quit_2_fd_asm(src, dst, "can't get source size");
+	if ((b_size = get_fd_size_asm(dst)) < 0)
+		quit_2_fd_asm(src, dst, "can't get destination size");
+	if (a_size && !diff_v_files(src, dst))
+		quit_2_fd_asm(src, dst, "file is not compressed");
+	tmp = src;
+	src = dst;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+
+	if ((dst = syscall(319, "v_file", 0)) < 0)
+		quit_fd_asm(src, "can't open virtual file");
+	unlzw(dst, src);
+	close(src);
+
+	src = tmp;
+	if (seek_fd_asm(src) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+
+	if (size >= 1000000)
+		printf("LZW on %.1lf MB: ", (double)size / 1000000.);
+	else if (size >= 1000)
+		printf("LZW on %.1lf KB: ", (double)size / 1000.);
+	else
+		printf("LZW on %ld bytes: ", size);
+	sprintf(buff, "OK (%+ld%%)", size ? b_size * 100 / a_size - 100 : 0);
+	printf("%s\n", diff_v_files(src, dst) ? "KO" : buff);
+
+	close(src);
+	close(dst);
+}
+
+int		main(void) {
 	char		*files[10] = { "zip", "top", "touch", "apt-get", "ssh",
 		"sort", "sed", "pwd", "ps", "less" };
-	uint64_t	a_size, b_size;
 	uint64_t	i;
 
 	printf("------------------------------------\n");
-	for (int i = 0; i < 10; ++i)
+	for (i = 0; i < 10; ++i)
 		file(files[i]);
 	printf("------------------------------------\n");
-	for (i = 0; i < 5000000; i += i * 2 + 1) {
-		if (rand_v_file(&in, i) < 0
-				|| (crypt = syscall(319, "v_file", 0)) < 0
-				|| (out = syscall(319, "v_file", 0)) < 0)
-			quit_asm("can't open virtual file");
-		lzw(crypt, in);
-		a_size = get_fd_size_asm(in);
-		b_size = get_fd_size_asm(crypt);
-		unlzw(out, crypt);
-		if (seek_2_fd_asm(in, out))
-			quit_3_fd_asm(in, out, crypt, "can't seek into files");
-		printf("LZW random file (%ld bytes): ", i);
-		if ((diff = diff_v_files(in, out))) {
-			if (diff < 0)
-				quit_asm("can't read files");
-			printf("KO\n");
-			close_ret(in, crypt, out, 0);
-			continue;
-		}
-		printf("OK (%+ld%%)\n", a_size ? b_size * 100 / a_size - 100 : 0);
-		close_ret(in, crypt, out, 0);
-	}
-	return (close_ret(in, crypt, out, 0));
+	for (i = 0; i < 5000000; i += i * 2 + 1)
+		v_file(i);
+	return (0);
 }

@@ -45,12 +45,10 @@ static void		lzw_chunk(int64_t dst, int64_t src, int64_t *file_size,
 	if (dico.size == DICO_SIZE) {
 		if (value_writer(dst, RESET_CODE, dico.bits, NO_FLUSH, w_buff))
 			quit_2_fd_asm(src, dst, "can't write to destination file");
-	}
-	else if (!*file_size) {
+	} else if (!*file_size) {
 		if (value_writer(dst, STOP_CODE, dico.bits, FLUSH, w_buff))
 			quit_2_fd_asm(src, dst, "can't write to destination file");
-	}
-	else
+	} else
 		quit_2_fd_asm(src, dst, "can't read from source file");
 }
 
