@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/28 15:58:00 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/28 16:19:15 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "../utils/utils_asm.h"
 #include "asm/asm.h"
 
+/*
 int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff) {
 	int64_t		read_ret;
 
@@ -28,6 +29,7 @@ int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff) {
 	++buff->idx;
 	return (0);
 }
+*/
 
 int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, rw_buff_t *buff) {
 	uint16_t			mask = ((uint16_t)~0) >> (16 - size);

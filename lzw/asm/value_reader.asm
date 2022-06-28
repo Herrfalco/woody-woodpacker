@@ -1,6 +1,6 @@
 					global		value_reader_asm
 
-					extern		file_reader
+					extern		file_reader_asm
 
 					section		.text
 value_reader_asm:
@@ -29,7 +29,7 @@ value_reader_asm:
 					mov			rdi,				qword[rsp+40]
 					lea			rsi,				[rsp+2]
 					mov			rdx,				qword[rsp+16]
-					call		file_reader
+					call		file_reader_asm
 
 					cmp			rax,				-1
 					je			.set_eof

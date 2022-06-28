@@ -30,7 +30,8 @@ file_reader_asm:
 
 					mov			r9,					qword[r8+1032]
 					mov			r9b,				byte[r8+r9]
-					mov			byte[rsp+8],		r9b
+					mov			r10,				qword[rsp+8]
+					mov			byte[r10],			r9b
 
 					inc			byte[r8+1032]
 

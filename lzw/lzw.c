@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:17:16 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/28 15:59:04 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/28 16:22:45 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static void		lzw_chunk(int64_t dst, int64_t src, int64_t *file_size,
 
 	dico.bits = 9;
 	for (; *file_size && dico.size < DICO_SIZE
-			&& !(file_reader(src, (uint8_t *)&value, r_buff));
+			&& !(file_reader_asm(src, (uint8_t *)&value, r_buff));
 			--*file_size, last_value = value, value = 0) {
 		if (!init)
 			init = 1;
