@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 12:46:15 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/26 21:01:15 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/28 13:18:02 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, 
 	return (0);
 }
 
+/*
 int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buff) {
 	int64_t				read_ret = 0;
 	uint8_t				byte;
@@ -67,7 +68,7 @@ int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buf
 		buff->dword |= byte;
 		buff->dw_size += 8;
 	}
-	if (read_ret == -1)
+	if (!buff->error && read_ret == -1)
 		buff->error = 1;
 	if (buff->dw_size >= size) {
 		buff->dw_size -= size;
@@ -76,3 +77,4 @@ int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buf
 	}
 	return (-1);
 }
+*/

@@ -17,12 +17,12 @@ typedef enum	flush_e {
 }				flush_t;
 
 struct			rw_buff_s {
-	uint8_t		bytes[BUFF_SIZE];
-	uint64_t	b_size;
-	uint64_t	idx;
-	uint32_t	dword;
-	uint64_t	dw_size;
-	uint8_t		error;
+	uint8_t		bytes[BUFF_SIZE];	// +0
+	uint64_t	b_size;				// +1024
+	uint64_t	idx;				// +1032
+	uint32_t	dword;				// +1040
+	uint64_t	dw_size;			// +1044
+	uint8_t		error;				// +1052
 }				__attribute__((packed));
 
 typedef struct	rw_buff_s		rw_buff_t;
@@ -38,7 +38,6 @@ typedef struct	s_dico		t_dico;
 int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff);
 int64_t		file_writer(int64_t fd, uint8_t byte, flush_t flush, rw_buff_t *buff);
 int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, rw_buff_t *buff);
-int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buff);
 
 int			get_bits_nb(uint64_t dico_size);
 int64_t		check_dico(uint16_t last_value, uint16_t value, t_dico *dico);

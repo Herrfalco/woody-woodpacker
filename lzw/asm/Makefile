@@ -2,7 +2,8 @@ SRCS	=	new_entry.asm \
 			find_first_pattern.asm \
 			entry_writer.asm \
 			unlzw.asm \
-			unlzw_chunk.asm
+			unlzw_chunk.asm \
+			value_reader.asm
 
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm
