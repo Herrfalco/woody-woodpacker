@@ -52,10 +52,11 @@ value_reader_asm:
 					jb			.err
 
 					sub			qword[r8+1044],		r9
+
 					mov			rcx,				qword[r8+1044]
 					mov			eax,				dword[r8+1040]
 					shr			eax,				cl
-					mov			bx,					word[r8]
+					mov			bx,					word[rsp]
 					and			ax,					bx
 					mov			r9,					qword[rsp+32]
 					mov			word[r9],			ax
