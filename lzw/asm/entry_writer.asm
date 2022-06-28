@@ -1,5 +1,5 @@
 					global		entry_writer_asm
-					extern		file_writer
+					extern		file_writer_asm
 					section		.text
 
 entry_writer_asm:
@@ -33,7 +33,7 @@ entry_writer_asm:
 					mov			sil,				byte[r8+2]
 					xor			rdx,				rdx
 					mov			rcx,				qword[rsp+16]
-					call		file_writer
+					call		file_writer_asm
 
 					cmp			rax,				-1
 					je			.end
@@ -43,7 +43,7 @@ entry_writer_asm:
 
 	.out_dico:
 					xor			rdx,				rdx
-					call		file_writer
+					call		file_writer_asm
 
 					cmp			rax,				-1
 					je			.end

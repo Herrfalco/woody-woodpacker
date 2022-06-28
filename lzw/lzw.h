@@ -36,7 +36,6 @@ struct			s_dico {
 typedef struct	s_dico		t_dico;
 
 int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff);
-int64_t		file_writer(int64_t fd, uint8_t byte, flush_t flush, rw_buff_t *buff);
 int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, rw_buff_t *buff);
 int64_t		value_reader(int64_t fd, uint16_t *value, uint64_t size, rw_buff_t *buff);
 
