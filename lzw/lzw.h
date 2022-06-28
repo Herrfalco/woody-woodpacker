@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/28 14:34:29 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/28 14:34:30 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/06/28 15:04:57 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ struct			s_dico {
 
 typedef struct	s_dico		t_dico;
 
-int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff);
 int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, rw_buff_t *buff);
 
 int			get_bits_nb(uint64_t dico_size);

@@ -12,6 +12,7 @@ ASM		=	asm/new_entry.o \
 			asm/unlzw_chunk.o \
 			asm/value_reader.o \
 			asm/file_writer.o \
+			asm/file_reader.o \
 			../utils/asm/get_fd_size.o \
 			../utils/asm/seek.o \
 			../utils/asm/str_len.o \
