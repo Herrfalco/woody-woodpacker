@@ -1,6 +1,6 @@
 						global		unlzw_chunk_asm
 						extern		value_reader_asm
-						extern		file_writer
+						extern		file_writer_asm
 						extern		quit_2_fd_asm
 						extern		b_zero_asm
 						extern		entry_writer_asm
@@ -108,7 +108,7 @@ unlzw_chunk_asm:
 						xor			rsi,				rsi
 						mov			rdx,				2
 						mov			rcx,				qword[rsp+15376]
-						call		file_writer
+						call		file_writer_asm
 
 						cmp			rax,				-1
 						je			.write_err

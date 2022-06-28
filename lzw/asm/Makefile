@@ -3,7 +3,8 @@ SRCS	=	new_entry.asm \
 			entry_writer.asm \
 			unlzw.asm \
 			unlzw_chunk.asm \
-			value_reader.asm
+			value_reader.asm \
+			file_writer.asm
 
 OBJS	=	$(SRCS:.asm=.o)
 CC		=	nasm

@@ -11,12 +11,13 @@ ASM		=	asm/new_entry.o \
 			asm/unlzw.o \
 			asm/unlzw_chunk.o \
 			asm/value_reader.o \
+			asm/file_writer.o \
 			../utils/asm/get_fd_size.o \
 			../utils/asm/seek.o \
 			../utils/asm/str_len.o \
 			../utils/asm/quit.o \
 			../utils/asm/sat_sub.o \
-			../utils/asm/b_zero.o
+			../utils/asm/b_zero.o 
 
 OBJS	=	$(SRCS:.c=.o)
 

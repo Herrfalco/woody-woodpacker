@@ -13,20 +13,7 @@
 #include "lzw.h"
 #include "../includes.h"
 #include "../utils/utils_asm.h"
-
-int64_t		file_writer(int64_t fd, uint8_t byte, flush_t flush, rw_buff_t *buff) {
-	int64_t		write_ret;
-
-	if (flush != ONLY_FLUSH)
-		buff->bytes[buff->b_size++] = byte;
-	if (flush || buff->b_size == BUFF_SIZE) {
-		if ((write_ret = write(fd, buff->bytes, buff->b_size)) < 0
-				|| (uint64_t)write_ret != buff->b_size)
-			return (-1);
-		buff->b_size = 0;
-	}
-	return (0);
-}
+#include "asm/asm.h"
 
 int64_t		file_reader(int64_t fd, uint8_t *byte, rw_buff_t *buff) {
 	int64_t		read_ret;
@@ -48,7 +35,7 @@ int64_t		value_writer(int64_t fd, uint16_t value, uint64_t size, flush_t flush, 
 	buff->dword |= ((uint32_t)(value & mask)) << (32 - size - buff->dw_size);
 	buff->dw_size += size;
 	while (buff->dw_size >= 8 || (flush && buff->dw_size > 0)) {
-		if (file_writer(fd, buff->dword >> 24, buff->dw_size <= 8 ? flush : NO_FLUSH, buff))
+		if (file_writer_asm(fd, buff->dword >> 24, buff->dw_size <= 8 ? flush : NO_FLUSH, buff))
 			return (-1);
 		buff->dword <<= 8;
 		buff->dw_size = sat_sub_asm(buff->dw_size, 8);
