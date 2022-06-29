@@ -9,9 +9,10 @@ file_reader_asm:
 					push		rdx,				; *buff		+0
 
 					mov			rax,				qword[rdx+1032]
+	.bef_cmp:
 					cmp			rax,				qword[rdx+1024]
 					jne			.get_byte
-					
+
 					mov			r8,					qword[rsp]
 					mov			qword[r8+1032],		0
 
@@ -33,7 +34,7 @@ file_reader_asm:
 					mov			r10,				qword[rsp+8]
 					mov			byte[r10],			r9b
 
-					inc			byte[r8+1032]
+					inc			qword[r8+1032]
 
 					xor			rax,				rax
 					jmp			.end
