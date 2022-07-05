@@ -6,106 +6,94 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/06/13 16:49:33 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/04 15:57:37 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "elf64.h"
+#include <elf.h>
+#include <unistd.h>
+#include "../utils/utils_asm.h"
 
-#define CODE		"\xb8\x01\x00\x00\x00" \
-					"\xbf\x01\x00\x00\x00" \
-					"\xbe\x00\x10\x40\x00" \
-					"\xba\x0e\x00\x00\x00" \
-					"\x0f\x05" \
-					"\xb8\x3c\x00\x00\x00" \
-					"\x48\x31\xff" \
-					"\x0f\x05"
+#define PRE_CODE		"\x55" \
+						"\x48\x89\xe5" \
+						"\x48\x83\xe4\xf0" \
+						"\x48\x83\xec\x10" \
+						"\x48\xb8\x2e\x2e\x2e\x2e\x57" \
+						"\x4f\x4f\x44" \
+						"\x48\x89\x04\x24" \
+						"\x48\xb8\x59\x2e\x2e\x2e\x2e" \
+						"\x0a\x00\x00" \
+						"\x48\x89\x44\x24\x08" \
+						"\xbf\x01\x00\x00\x00" \
+						"\x48\x89\xe6" \
+						"\xba\x0e\x00\x00\x00" \
+						"\xb8\x01\x00\x00\x00" \
+						"\x0f\x05" \
+						"\x48\x89\xec" \
+						"\x5d" \
+						"\x48\xb8"
+#define PRE_CODE_SZ		67
+#define POST_CODE		"\xff\xe0"
+#define POST_CODE_SZ	2
 
-#define CODE_SZ		32
+int		file_cpy(int src) {
+	uint8_t			buff[BUFF_SIZE] = { 0 };
+	int				dst = open("woody", O_RDWR | O_TRUNC | O_CREAT, 0777);
+	uint64_t		read_ret;
 
-void	str_n_cpy(uint8_t *dst, uint8_t *src, size_t size) {
-	for (; size; ++dst, ++src, --size)
-		*dst = *src;
-	*dst = '\0';
-}
-
-void	write_seg(int fd, uint32_t flags, uint64_t offset, uint64_t addr, uint64_t size) {
-	seg_hdr_t		seg_hdr = { 0 };
-
-	seg_hdr.type = LOAD;
-	seg_hdr.flags = flags,
-	seg_hdr.offset = offset,
-	seg_hdr.vaddr = addr,
-	seg_hdr.paddr = addr,
-	seg_hdr.filesz = size,
-	seg_hdr.memsz = size,
-	seg_hdr.align = PAGE_SZ;
-	write(fd, &seg_hdr, sizeof(seg_hdr));
-}
-
-void	write_hdr(int fd, uint64_t entry, uint16_t seg_nb) {
-	static uint8_t			magic[] = MAGIC;
-	elf64_hdr_t				file_hdr = { 0 };
-
-	lseek(fd, 0, SEEK_SET);
-	str_n_cpy(file_hdr.ident.magic, magic, MAGIC_SZ);
-	file_hdr.ident.bit_class = OS_64;
-	file_hdr.ident.data_enc = LSB;
-	file_hdr.ident.version = VERSION;
-	file_hdr.ident.os = SYS_V;
-	file_hdr.type = EXEC;
-	file_hdr.machine = AMD64;
-	file_hdr.version = VERSION;
-	file_hdr.entry = entry;
-	file_hdr.seg_hoff = sizeof(elf64_hdr_t);
-	file_hdr.ehsize = sizeof(elf64_hdr_t);
-	file_hdr.seg_hentsize = sizeof(seg_hdr_t);
-	file_hdr.seg_hnum = seg_nb;
-	write(fd, &file_hdr, sizeof(file_hdr));
-}
-
-uint16_t	cpy_segs(int input, int output) {
-	uint16_t	seg_nb, i, last_vaddr;
-	uint64_t	seg_tab, filesz;
-	uint8_t		buff[BUFF_SIZE];
-	seg_hdr_t	seg_hdr, last_vaddr;
-
-	lseek(input, SEG_NB, SEEK_SET);
-	read(input, &seg_nb, sizeof(uint16_t));
-	lseek(input, SEG_TAB, SEEK_SET);
-	read(input, &seg_tab, sizeof(uint64_t));
-	lseek(output, sizeof(elf64_hdr_t), SEEK_SET);
-	for (i = 0, last_vaddr = 0; i < seg_nb; ++i) {
-		lseek(input, seg_tab + i * sizeof(seg_hdr_t), SEEK_SET);
-		read(input, &seg_hdr, sizeof(seg_hdr_t));	
-		if (seg_hdr.vaddr > last_offset.vaddr)
-			last_vaddr = seg_hdr;
-		filesz = seg_hdr.filesz;
-		write(output, &seg_hdr, sizeof(seg_hdr_t));
-		lseek(input, seg_hdr.offset, SEEK_SET);
-		lseek(output, seg_hdr.offset, SEEK_SET);
-		for (; filesz; sat_sub(filesz, BUFF_SIZE)) {
-			read(input, buff, filesz > BUFF_SIZE ? BUFF_SIZE : filesz);
-			write(output
+	if (dst < 0)
+		return (-1);
+	while ((read_ret = read(src, buff, BUFF_SIZE)) > 0) {
+		if (write(dst, buff, read_ret) != read_ret) {
+			close(dst);
+			return (-1);
 		}
 	}
-	return (seg_nb);
+	if (read_ret < 0 || lseek(dst, 0, SEEK_SET) < 0) {
+		close(dst);
+		return (-1);
+	}
+	return (dst);
 }
 
-int		main(void) {
-	uint8_t			*code = (uint8_t *)CODE;
-	int				fd = open("test.exe", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	uint8_t			fill[0x1000] = { 0 };
+int		main(int argc, char **argv) {
+	int			src, dst;
+	uint64_t	i;
 
-	if (fd < 0)
-		fprintf(stderr, "Error: Can't open file test.exe\n");
+	Elf64_Ehdr  hdr;
+	Elf64_Phdr	p_hdr;
 
-	write_seg(fd, R | W | X, 0x1000, BASE_ADDR, CODE_SZ);
-	write_seg(fd, R | W | X, 0x2000, BASE_ADDR + 0x1000, 14);
+	if (argc != 2)
+		quit_asm("need 1 argument");	
+	if ((src = open(argv[1], O_RDONLY)) < 0)
+		quit_asm("can't open source file");	
 
-	write(fd, fill, 0x1000 - (sizeof(elf64_hdr_t) + 2 * sizeof(seg_hdr_t)));
-	write(fd, code, CODE_SZ);
-	write(fd, fill, 0x1000 - CODE_SZ);
-	write(fd, "Helloworld...\n", 14);
+	if ((dst = file_cpy(src)) < 0)
+		quit_fd_asm(src, "can't copy srouce file");
+	close(src);
+	
+	if (read(dst, &hdr, sizeof(hdr)) != hdr.e_ehsize)
+		quit_fd_asm(dst, "can't read from source file");
+
+	printf("0x%016lx\n", hdr.e_entry);
+
+	for (i = 0; i < hdr.e_phnum; ++i) {
+		if (read(dst, &p_hdr, hdr.e_phentsize) != hdr.e_phentsize)
+			quit_fd_asm(dst, "can't read from source file");
+		if (p_hdr.p_type == PT_NOTE)
+			break;
+	}
+
+	if (i == hdr.e_phnum)
+		quit_fd_asm(dst, "no NOTE segment in this file");
+
+	p_hdr.p_type = PT_LOAD;
+
+	if (lseek(dst, sizeof(p_hdr) * -1, SEEK_CUR) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+
+	if (write(dst, &p_hdr, sizeof(p_hdr)) < 0)
+		quit_fd_asm(dst, "can't write into destination file");
+
 	return (0);
 }
