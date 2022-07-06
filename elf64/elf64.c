@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/04 15:57:37 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/06 13:32:57 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,18 @@ int		file_cpy(int src) {
 	return (dst);
 }
 
+int		str_cmp(uint8_t *s1, uint8_t *s2) {
+	for (; *s1 && *s1 == *s2; ++s1, ++s2);
+	return (*s1 - *s2);
+}
+
 int		main(int argc, char **argv) {
 	int			src, dst;
-	uint64_t	i;
+	uint64_t	i, saved_entry;
+	uint8_t		str_tab[BUFF_SIZE];
 
 	Elf64_Ehdr  hdr;
+	Elf64_Shdr	s_hdr, s_stab;
 	Elf64_Phdr	p_hdr;
 
 	if (argc != 2)
@@ -75,25 +82,53 @@ int		main(int argc, char **argv) {
 	if (read(dst, &hdr, sizeof(hdr)) != hdr.e_ehsize)
 		quit_fd_asm(dst, "can't read from source file");
 
-	printf("0x%016lx\n", hdr.e_entry);
+	saved_entry = hdr.e_entry;
 
+	if (hdr.e_shstrndx == SHN_XINDEX)
+		printf("chiant\n");
+	switch (hdr.e_shstrndx) {
+		case SHN_UNDEF:
+			printf("no\n");
+			break;
+		case SHN_XINDEX:
+			printf("chiant\n");
+			break;
+		default:
+			printf("0x%x\n", hdr.e_shstrndx);
+	}
+
+	if (lseek(dst, hdr.e_shoff + hdr.e_shstrndx * hdr.e_shentsize, SEEK_SET) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+	if (read(dst, &s_stab, hdr.e_shentsize) != hdr.e_shentsize)
+		quit_fd_asm(dst, "can't read from source file");
+	if (s_stab.sh_type == SHT_STRTAB)
+		printf("str tab ok\n");
+	else
+		printf("not an str tab\n");
+	if (s_stab.sh_size > BUFF_SIZE)
+		quit_fd_asm(dst, "buffer is not big enough");
+	if (lseek(dst, s_stab.sh_offset, SEEK_SET) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+	if (read(dst, str_tab, s_stab.sh_size) != s_stab.sh_size)
+		quit_fd_asm(dst, "can't read from source file");
+	if (lseek(dst, hdr.e_shoff, SEEK_SET) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
+	for (i = 0; i < hdr.e_shnum; ++i) {
+		if (read(dst, &s_hdr, hdr.e_shentsize) != hdr.e_shentsize)
+			quit_fd_asm(dst, "can't read from source file");
+		if (!str_cmp(str_tab + s_hdr.sh_name, ".data"))
+			break;
+	}
+	if (i == hdr.e_shnum)
+		quit_fd_asm(dst, "can't find data section");
+	if (lseek(dst, hdr.e_phoff, SEEK_SET) < 0)
+		quit_fd_asm(dst, "can't seek into destination file");
 	for (i = 0; i < hdr.e_phnum; ++i) {
 		if (read(dst, &p_hdr, hdr.e_phentsize) != hdr.e_phentsize)
 			quit_fd_asm(dst, "can't read from source file");
-		if (p_hdr.p_type == PT_NOTE)
+		if (s_hdr.sh_addr >= p_hdr.p_vaddr && s_hdr.sh_addr < p_hdr.p_vaddr + p_hdr.p_memsz)
 			break;
 	}
-
-	if (i == hdr.e_phnum)
-		quit_fd_asm(dst, "no NOTE segment in this file");
-
-	p_hdr.p_type = PT_LOAD;
-
-	if (lseek(dst, sizeof(p_hdr) * -1, SEEK_CUR) < 0)
-		quit_fd_asm(dst, "can't seek into destination file");
-
-	if (write(dst, &p_hdr, sizeof(p_hdr)) < 0)
-		quit_fd_asm(dst, "can't write into destination file");
-
+	printf("%ld\n", i);
 	return (0);
 }
