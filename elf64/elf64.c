@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/06 21:56:29 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/07 11:06:35 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 
 int		file_cpy(int dst, int src, int64_t size) {
 	uint8_t			buff[BUFF_SIZE] = { 0 };
-	uint64_t		read_ret;
+	int64_t			read_ret;
 
 	while (size) {
 		if ((read_ret = read(src, buff, size < 0 || size > BUFF_SIZE ? BUFF_SIZE : size)) < 1
@@ -120,14 +120,14 @@ int		main(int argc, char **argv) {
 
 	if (lseek(src, s_stab.sh_offset, SEEK_SET) < 0)
 		quit_fd_asm(src, "can't seek into destination file");
-	if (read(src, str_tab, s_stab.sh_size) != s_stab.sh_size)
+	if (read(src, str_tab, s_stab.sh_size) != (int64_t)s_stab.sh_size)
 		quit_fd_asm(src, "can't read from source file");
 	if (lseek(src, hdr.e_shoff, SEEK_SET) < 0)
 		quit_fd_asm(src, "can't seek into destination file");
 	for (i = 0; i < hdr.e_shnum; ++i) {
 		if (read(src, &s_data, hdr.e_shentsize) != hdr.e_shentsize)
 			quit_fd_asm(src, "can't read from source file");
-		if (!str_cmp(str_tab + s_data.sh_name, ".data"))
+		if (!str_cmp(str_tab + s_data.sh_name, (uint8_t *)".data"))
 			break;
 	}
 	printf("section:%ld\n", i);
