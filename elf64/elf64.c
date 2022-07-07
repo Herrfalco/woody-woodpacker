@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/07 14:24:08 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/07 16:28:02 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ int		main(int argc, char **argv) {
 
 	p_data.p_filesz += load_size;
 	p_data.p_memsz += load_size - bss_sz;
+	p_data.p_flags = PF_X | PF_W | PF_R;
 
 	if ((dst = open("woody", O_WRONLY | O_CREAT | O_TRUNC, 0777)) < 0)
 		quit_fd_asm(src, "can't open destination file");	
@@ -170,11 +171,11 @@ int		main(int argc, char **argv) {
 
 	if (lseek(dst, hdr.e_phoff, SEEK_SET) < 0)
 		quit_2_fd_asm(src, dst, "can't seek into destination file");
+	if (lseek(src, hdr.e_phoff, SEEK_SET) < 0)
+		quit_2_fd_asm(src, dst, "can't seek into destination file");
 	for (i = 0; i < hdr.e_phnum; ++i) {
-		if (read(dst, &p_hdr, hdr.e_phentsize) != hdr.e_phentsize)
+		if (read(src, &p_hdr, hdr.e_phentsize) != hdr.e_phentsize)
 			quit_2_fd_asm(src, dst, "can't read from destination file");
-		if (lseek(dst, sizeof(p_hdr) * -1, SEEK_CUR) < 0)
-			quit_2_fd_asm(src, dst, "can't seek into destination file");
 		if (i == p_data_i)
 			p_hdr = p_data;
 		if (p_hdr.p_offset > p_data.p_offset)
@@ -185,11 +186,11 @@ int		main(int argc, char **argv) {
 
 	if (lseek(dst, hdr.e_shoff, SEEK_SET) < 0)
 		quit_2_fd_asm(src, dst, "can't seek into destination file");
+	if (lseek(src, hdr.e_shoff, SEEK_SET) < 0)
+		quit_2_fd_asm(src, dst, "can't seek into destination file");
 	for (i = 0; i < hdr.e_shnum; ++i) {
-		if (read(dst, &s_hdr, hdr.e_shentsize) != hdr.e_shentsize)
+		if (read(src, &s_hdr, hdr.e_shentsize) != hdr.e_shentsize)
 			quit_2_fd_asm(src, dst, "can't read from destination file");
-		if (lseek(dst, sizeof(s_hdr) * -1, SEEK_CUR) < 0)
-			quit_2_fd_asm(src, dst, "can't seek into destination file");
 		if (i == s_data_i)
 			s_hdr = s_data;
 		if (s_hdr.sh_offset > s_data.sh_offset)
