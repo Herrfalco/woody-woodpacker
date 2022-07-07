@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/06 13:32:57 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/06 21:56:29 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,25 +35,36 @@
 #define PRE_CODE_SZ		67
 #define POST_CODE		"\xff\xe0"
 #define POST_CODE_SZ	2
+#define CODE_SZ			PRE_CODE_SZ + 8 + POST_CODE_SZ
+#define PAGE_SZ			4096
 
-int		file_cpy(int src) {
+int		file_cpy(int dst, int src, int64_t size) {
 	uint8_t			buff[BUFF_SIZE] = { 0 };
-	int				dst = open("woody", O_RDWR | O_TRUNC | O_CREAT, 0777);
 	uint64_t		read_ret;
 
-	if (dst < 0)
-		return (-1);
-	while ((read_ret = read(src, buff, BUFF_SIZE)) > 0) {
-		if (write(dst, buff, read_ret) != read_ret) {
-			close(dst);
+	while (size) {
+		if ((read_ret = read(src, buff, size < 0 || size > BUFF_SIZE ? BUFF_SIZE : size)) < 1
+				|| write(dst, buff, read_ret) != read_ret) {
+			if (size < 0 && !read_ret)
+				return (0);
 			return (-1);
 		}
+		if (size > 0)
+			size = sat_sub_asm(size, BUFF_SIZE);
 	}
-	if (read_ret < 0 || lseek(dst, 0, SEEK_SET) < 0) {
-		close(dst);
-		return (-1);
+	return (0);
+}
+
+int		file_zero(int dst, uint64_t size) {
+	uint8_t			buff[BUFF_SIZE] = { 0 };
+	uint64_t		write_sz;
+
+	for (; size; size = sat_sub_asm(size, BUFF_SIZE)) { 
+		write_sz = size > BUFF_SIZE ? BUFF_SIZE : size;
+		if (write(dst, buff, write_sz) < 0)
+			return (-1);
 	}
-	return (dst);
+	return (0);
 }
 
 int		str_cmp(uint8_t *s1, uint8_t *s2) {
@@ -63,24 +74,23 @@ int		str_cmp(uint8_t *s1, uint8_t *s2) {
 
 int		main(int argc, char **argv) {
 	int			src, dst;
-	uint64_t	i, saved_entry;
+	uint64_t	i, saved_entry, bss_sz, bss_off, load_size;
+	int64_t		src_sz;
 	uint8_t		str_tab[BUFF_SIZE];
 
 	Elf64_Ehdr  hdr;
-	Elf64_Shdr	s_hdr, s_stab;
-	Elf64_Phdr	p_hdr;
+	Elf64_Shdr	s_data, s_stab;
+	Elf64_Phdr	p_data;
 
 	if (argc != 2)
 		quit_asm("need 1 argument");	
 	if ((src = open(argv[1], O_RDONLY)) < 0)
 		quit_asm("can't open source file");	
 
-	if ((dst = file_cpy(src)) < 0)
-		quit_fd_asm(src, "can't copy srouce file");
-	close(src);
-	
-	if (read(dst, &hdr, sizeof(hdr)) != hdr.e_ehsize)
-		quit_fd_asm(dst, "can't read from source file");
+	if ((src_sz = get_fd_size_asm(src)) < 0)
+		quit_fd_asm(src, "can't get source file size");
+	if (read(src, &hdr, sizeof(hdr)) != hdr.e_ehsize)
+		quit_fd_asm(src, "can't read from source file");
 
 	saved_entry = hdr.e_entry;
 
@@ -97,38 +107,68 @@ int		main(int argc, char **argv) {
 			printf("0x%x\n", hdr.e_shstrndx);
 	}
 
-	if (lseek(dst, hdr.e_shoff + hdr.e_shstrndx * hdr.e_shentsize, SEEK_SET) < 0)
-		quit_fd_asm(dst, "can't seek into destination file");
-	if (read(dst, &s_stab, hdr.e_shentsize) != hdr.e_shentsize)
-		quit_fd_asm(dst, "can't read from source file");
+	if (lseek(src, hdr.e_shoff + hdr.e_shstrndx * hdr.e_shentsize, SEEK_SET) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+	if (read(src, &s_stab, hdr.e_shentsize) != hdr.e_shentsize)
+		quit_fd_asm(src, "can't read from source file");
 	if (s_stab.sh_type == SHT_STRTAB)
 		printf("str tab ok\n");
 	else
 		printf("not an str tab\n");
 	if (s_stab.sh_size > BUFF_SIZE)
-		quit_fd_asm(dst, "buffer is not big enough");
-	if (lseek(dst, s_stab.sh_offset, SEEK_SET) < 0)
-		quit_fd_asm(dst, "can't seek into destination file");
-	if (read(dst, str_tab, s_stab.sh_size) != s_stab.sh_size)
-		quit_fd_asm(dst, "can't read from source file");
-	if (lseek(dst, hdr.e_shoff, SEEK_SET) < 0)
-		quit_fd_asm(dst, "can't seek into destination file");
+		quit_fd_asm(src, "buffer is not big enough");
+
+	if (lseek(src, s_stab.sh_offset, SEEK_SET) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
+	if (read(src, str_tab, s_stab.sh_size) != s_stab.sh_size)
+		quit_fd_asm(src, "can't read from source file");
+	if (lseek(src, hdr.e_shoff, SEEK_SET) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
 	for (i = 0; i < hdr.e_shnum; ++i) {
-		if (read(dst, &s_hdr, hdr.e_shentsize) != hdr.e_shentsize)
-			quit_fd_asm(dst, "can't read from source file");
-		if (!str_cmp(str_tab + s_hdr.sh_name, ".data"))
+		if (read(src, &s_data, hdr.e_shentsize) != hdr.e_shentsize)
+			quit_fd_asm(src, "can't read from source file");
+		if (!str_cmp(str_tab + s_data.sh_name, ".data"))
 			break;
 	}
+	printf("section:%ld\n", i);
 	if (i == hdr.e_shnum)
-		quit_fd_asm(dst, "can't find data section");
-	if (lseek(dst, hdr.e_phoff, SEEK_SET) < 0)
-		quit_fd_asm(dst, "can't seek into destination file");
+		quit_fd_asm(src, "can't find data section");
+	if (lseek(src, hdr.e_phoff, SEEK_SET) < 0)
+		quit_fd_asm(src, "can't seek into destination file");
 	for (i = 0; i < hdr.e_phnum; ++i) {
-		if (read(dst, &p_hdr, hdr.e_phentsize) != hdr.e_phentsize)
-			quit_fd_asm(dst, "can't read from source file");
-		if (s_hdr.sh_addr >= p_hdr.p_vaddr && s_hdr.sh_addr < p_hdr.p_vaddr + p_hdr.p_memsz)
+		if (read(src, &p_data, hdr.e_phentsize) != hdr.e_phentsize)
+			quit_fd_asm(src, "can't read from source file");
+		if (s_data.sh_addr >= p_data.p_vaddr && s_data.sh_addr < p_data.p_vaddr + p_data.p_memsz)
 			break;
 	}
-	printf("%ld\n", i);
+	printf("segment:%ld\n", i);
+
+	hdr.e_entry = p_data.p_vaddr + p_data.p_memsz;
+	bss_sz = p_data.p_memsz - p_data.p_filesz;
+	bss_off = p_data.p_offset + p_data.p_filesz;
+	load_size = round_up_asm(bss_sz + CODE_SZ, PAGE_SZ);
+	p_data.p_filesz += load_size;
+	p_data.p_memsz += load_size;
+	printf("load_size:%ld\n", load_size);
+
+	if ((dst = open("woody", O_WRONLY | O_CREAT | O_TRUNC, 0777)) < 0)
+		quit_fd_asm(src, "can't open destination file");	
+	if (write(dst, &hdr, sizeof(hdr)) != sizeof(hdr))
+		quit_2_fd_asm(dst, src, "can't write to destination file");
+	if (lseek(src, sizeof(hdr), SEEK_SET) < 0)
+		quit_2_fd_asm(dst, src, "can't seek into source file");
+	if (file_cpy(dst, src, bss_off - sizeof(hdr)) < 0)
+		quit_2_fd_asm(dst, src, "can't copy from source file");
+
+	if (file_zero(dst, bss_sz) < 0)
+		quit_2_fd_asm(dst, src, "can't fill destination file with zeros");
+	if (write(dst, PRE_CODE, PRE_CODE_SZ) != PRE_CODE_SZ
+			|| write(dst, &saved_entry, 8) != 8
+			|| write(dst, POST_CODE, POST_CODE_SZ) != POST_CODE_SZ)
+		quit_2_fd_asm(dst, src, "can't write to destination file");
+	if (file_zero(dst, load_size - bss_sz - CODE_SZ) < 0)
+		quit_2_fd_asm(dst, src, "can't fill destination file with zeros");
+	if (file_cpy(dst, src, -1) < 0)
+		quit_2_fd_asm(dst, src, "can't copy to destination file");
 	return (0);
 }
