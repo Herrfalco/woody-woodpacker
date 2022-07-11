@@ -1,10 +1,10 @@
 				global main
 
 main:
-				push	rbp
-				mov		rbp,			rsp
-
-				and		rsp,			0xfffffffffffffff0
+				push	rax
+				push	rdi
+				push	rsi
+				push	rdx
 
 				sub		rsp,			16
 
@@ -19,11 +19,11 @@ main:
 				mov		rax,			1
 				syscall
 
-				mov		rbx,			0x1122334455667788
-				sub		rax,			rbx
-				mov		rbx,			0x1122334455667788
-				add		rax,			rbx
-				call	rax
+				add		rsp,			16
 
-				mov		rsp,			rbp
-				pop		rbp
+				pop		rdx
+				pop		rsi
+				pop		rdi
+				pop		rax
+
+				jmp		0x11223344

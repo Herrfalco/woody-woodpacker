@@ -9,6 +9,7 @@ OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
 RM		=	rm -rf
+GARB	=	woody
 
 all		:	$(NAME)
 
@@ -24,6 +25,6 @@ clean	:
 
 fclean	:	clean
 			make -C ../utils fclean
-			$(RM) $(NAME)
+			$(RM) $(NAME) $(GARB)
 
 re		:	fclean all
