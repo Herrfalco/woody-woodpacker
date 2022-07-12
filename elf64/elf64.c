@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/12 01:58:42 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/12 15:36:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,10 @@
 #include <unistd.h>
 #include "../utils/utils_asm.h"
 
-#define PRE_CODE		"\x50\x57\x56\x52\x48" \
-						"\x83\xec\x10\x48\xbb" \
-						"\x2e\x2e\x2e\x2e\x57" \
-						"\x4f\x4f\x44\x48\x89" \
-						"\x1c\x24\x48\xbb\x59" \
-						"\x2e\x2e\x2e\x2e\x0a" \
-						"\x00\x00\x48\x89\x5c" \
-						"\x24\x08\xbf\x01\x00" \
-						"\x00\x00\x48\x89\xe6" \
-						"\xba\x0e\x00\x00\x00" \
-						"\xb8\x01\x00\x00\x00" \
-						"\x0f\x05\x48\x83\xc4" \
-						"\x10\x5a\x5e\x5f\x58" \
-						"\xe9"
-#define PRE_CODE_SZ		66
-#define CODE_SZ			PRE_CODE_SZ + 4
 #define PAGE_SZ			4096
+
+extern uint8_t		shellcode;
+extern uint8_t		shellcode_end;
 
 int		file_cpy(int dst, int src, int64_t size) {
 	uint8_t			buff[BUFF_SIZE] = { 0 };
@@ -69,12 +56,14 @@ int		str_cmp(uint8_t *s1, uint8_t *s2) {
 int		main(int argc, char **argv) {
 	int			src, dst;
 	uint64_t	i, s_data_i, p_data_i, rel_entry, bss_sz, bss_off, load_size;
-	int64_t		src_sz;
+	int64_t		src_sz, write_ret;
 	uint8_t		str_tab[BUFF_SIZE];
 
 	Elf64_Ehdr  hdr;
 	Elf64_Shdr	s_data, s_hdr, s_stab;
 	Elf64_Phdr	p_data, p_hdr;
+
+	uint64_t	code_sz = &shellcode_end - &shellcode;
 
 	if (argc != 2)
 		quit_asm("need 1 argument");	
@@ -132,11 +121,11 @@ int		main(int argc, char **argv) {
 			break;
 	}
 
-	rel_entry = hdr.e_entry - (p_data.p_vaddr + p_data.p_memsz + CODE_SZ);;
+	rel_entry = hdr.e_entry - (p_data.p_vaddr + p_data.p_memsz + code_sz);
 	hdr.e_entry = p_data.p_vaddr + p_data.p_memsz;
 	bss_sz = p_data.p_memsz - p_data.p_filesz;
 	bss_off = p_data.p_offset + p_data.p_filesz;
-	load_size = round_up_asm(bss_sz + CODE_SZ, PAGE_SZ);
+	load_size = round_up_asm(bss_sz + code_sz, PAGE_SZ);
 
 	p_data.p_filesz += load_size;
 	p_data.p_memsz += load_size - bss_sz;
@@ -153,10 +142,11 @@ int		main(int argc, char **argv) {
 
 	if (file_zero(dst, bss_sz) < 0)
 		quit_2_fd_asm(dst, src, "can't fill destination file with zeros");
-	if (write(dst, PRE_CODE, PRE_CODE_SZ) != PRE_CODE_SZ
+	if ((write_ret = write(dst, &shellcode, code_sz - 4)) < 0
+			|| (uint64_t)write_ret != code_sz - 4
 			|| write(dst, &rel_entry, 4) != 4)
 		quit_2_fd_asm(dst, src, "can't write to destination file");
-	if (file_zero(dst, load_size - bss_sz - (CODE_SZ)) < 0)
+	if (file_zero(dst, load_size - bss_sz - code_sz) < 0)
 		quit_2_fd_asm(dst, src, "can't fill destination file with zeros");
 	if (file_cpy(dst, src, -1) < 0)
 		quit_2_fd_asm(dst, src, "can't copy to destination file");
