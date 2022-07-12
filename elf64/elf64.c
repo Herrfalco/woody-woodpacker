@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/12 00:51:22 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/12 01:58:42 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,19 @@
 #include <unistd.h>
 #include "../utils/utils_asm.h"
 
-#define PRE_CODE		"\x50" \
-						"\x57" \
-						"\x56" \
-						"\x52" \
-						"\x48\x83\xec\x10" \
-						"\x48\xbb\x2e\x2e\x2e\x2e\x57" \
-						"\x4f\x4f\x44" \
-						"\x48\x89\x1c\x24" \
-						"\x48\xbb\x59\x2e\x2e\x2e\x2e" \
-						"\x0a\x00\x00" \
-						"\x48\x89\x5c\x24\x08" \
-						"\xbf\x01\x00\x00\x00" \
-						"\x48\x89\xe6" \
+#define PRE_CODE		"\x50\x57\x56\x52\x48" \
+						"\x83\xec\x10\x48\xbb" \
+						"\x2e\x2e\x2e\x2e\x57" \
+						"\x4f\x4f\x44\x48\x89" \
+						"\x1c\x24\x48\xbb\x59" \
+						"\x2e\x2e\x2e\x2e\x0a" \
+						"\x00\x00\x48\x89\x5c" \
+						"\x24\x08\xbf\x01\x00" \
+						"\x00\x00\x48\x89\xe6" \
 						"\xba\x0e\x00\x00\x00" \
 						"\xb8\x01\x00\x00\x00" \
-						"\x0f\x05" \
-						"\x48\x83\xc4\x10" \
-						"\x5a" \
-						"\x5e" \
-						"\x5f" \
-						"\x58" \
+						"\x0f\x05\x48\x83\xc4" \
+						"\x10\x5a\x5e\x5f\x58" \
 						"\xe9"
 #define PRE_CODE_SZ		66
 #define CODE_SZ			PRE_CODE_SZ + 4

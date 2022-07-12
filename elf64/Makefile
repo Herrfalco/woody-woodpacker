@@ -9,7 +9,8 @@ OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 CFLAGS	=	-Wall -Wextra -Werror -no-pie
 RM		=	rm -rf
-GARB	=	woody
+GARB	=	woody \
+			shell_code.txt
 
 all		:	$(NAME)
 
