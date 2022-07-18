@@ -2,16 +2,15 @@ NAME	=	elf64
 SRCS	=	elf64.c
 UTILS	=	../utils/asm/quit.o \
 			../utils/asm/get_fd_size.o \
-			../utils/asm/str_len.o \
 			../utils/asm/round_up.o \
-			../utils/asm/sat_sub.o
+			../utils/asm/str_len.o
 SCODE	=	shell_code.asm
 OSCODE	= 	$(SCODE:.asm=.o)
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 AS		=	nasm
 AFLAGS	=	-felf64
-CFLAGS	=	-Wall -Wextra -Werror -no-pie
+CFLAGS	=	-no-pie -Wall -Wextra #-Werror
 RM		=	rm -rf
 GARB	=	woody
 

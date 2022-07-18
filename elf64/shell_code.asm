@@ -1,36 +1,38 @@
-				global shellcode
-				global shellcode_end
+				global sc
+				global sc_end
+				global sc_data
+				global sc_data_end
+				global sc_entry
+				global sc_old_entry
 
-				.text:
-shellcode:
-				push	rax
-				push	rbx
-				push	rcx
-				push	rdx
+sc:
 				push	rdi
 				push	rsi
+				push	rdx
 
-   				sub		rsp,			16
-
-   				mov		rbx,			0x444f4f572e2e2e2e
-   				mov		qword[rsp],		rbx
-   				mov		rbx,			0xa2e2e2e2e59
-   				mov		qword[rsp+8],	rbx
-
-   				mov		rdi,			1
-   				mov		rsi,			rsp
-   				mov		rdx,			14
-   				mov		rax,			1
+   				mov		rdi,		1
+   				lea		rsi,		[rel sc_msg]
+   				mov		rdx,		sc_msg_end - sc_msg
+   				mov		rax,		1
    				syscall
 
-   				add		rsp,			16
+				lea		rax,		[rel sc]
+				sub		rax,		qword[rel sc_entry]
+				add		rax,		qword[rel sc_old_entry]
 
+				pop		rdx
 				pop		rsi
 				pop		rdi
-				pop		rdx
-				pop		rcx
-				pop		rbx
-				pop		rax
 
-				jmp		0x11223344
-shellcode_end:
+				jmp		rax
+sc_end:
+
+sc_data:
+sc_entry:
+				dq		0
+sc_old_entry:
+				dq		0
+sc_msg:
+				db		"....WOODY....", 10
+sc_msg_end:
+sc_data_end:

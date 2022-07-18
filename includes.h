@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 14:13:09 by fcadet            #+#    #+#             */
-/*   Updated: 2022/06/24 14:13:46 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/14 18:12:20 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #define BUFF_SIZE		1024	// (must update buff_sz in aes_fd_dec.asm)
 
