@@ -59,27 +59,6 @@ aes_round_keys_rev:
 		aesimc				xmm9,		xmm9
 		ret
 
-aes_encoding:
-		movdqu		xmm14,		oword[rdi]	; data
-		movdqu		xmm0,		oword[rsi]	; key
-
-		call		aes_round_keys
-
-		pxor		xmm14,		xmm0		; Whitening step (Round 0)
-		aesenc		xmm14,		xmm1		; Round 1
-		aesenc		xmm14,		xmm2		; Round 2
-		aesenc		xmm14,		xmm3		; Round 3
-		aesenc		xmm14,		xmm4		; Round 4
-		aesenc		xmm14,		xmm5		; Round 5
-		aesenc		xmm14,		xmm6		; Round 6
-		aesenc		xmm14,		xmm7		; Round 7
-		aesenc		xmm14,		xmm8		; Round 8
-		aesenc		xmm14,		xmm9		; Round 9
-		aesenclast	xmm14,		xmm10		; Round 10
-
-		movdqu		oword[rdi],	xmm14
-		ret
-
 aes_decoding:
 		movdqu		xmm14,		oword[rdi]	; data
 		movdqu		xmm0,		oword[rsi]	; key
@@ -98,6 +77,27 @@ aes_decoding:
 		aesdec		xmm14,		xmm2		; Round 8
 		aesdec		xmm14,		xmm1		; Round 9
 		aesdeclast	xmm14,		xmm0		; Round 10
+
+		movdqu		oword[rdi],	xmm14
+		ret
+
+aes_encoding:
+		movdqu		xmm14,		oword[rdi]	; data
+		movdqu		xmm0,		oword[rsi]	; key
+
+		call		aes_round_keys
+
+		pxor		xmm14,		xmm0		; Whitening step (Round 0)
+		aesenc		xmm14,		xmm1		; Round 1
+		aesenc		xmm14,		xmm2		; Round 2
+		aesenc		xmm14,		xmm3		; Round 3
+		aesenc		xmm14,		xmm4		; Round 4
+		aesenc		xmm14,		xmm5		; Round 5
+		aesenc		xmm14,		xmm6		; Round 6
+		aesenc		xmm14,		xmm7		; Round 7
+		aesenc		xmm14,		xmm8		; Round 8
+		aesenc		xmm14,		xmm9		; Round 9
+		aesenclast	xmm14,		xmm10		; Round 10
 
 		movdqu		oword[rdi],	xmm14
 		ret
