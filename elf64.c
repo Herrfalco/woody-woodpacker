@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/19 15:33:37 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/19 16:37:39 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 
 #define PAGE_SZ			0x1000
 #define PAGE_MSK		0xfffffffffffff000
+#define BLOCK_MSK		0xfffffffffffffff0
 #define BUFF_SZ			1024
 
 extern uint8_t		sc;
@@ -27,6 +28,8 @@ extern uint8_t		sc_data;
 extern uint8_t		sc_data_end;
 extern uint64_t		sc_entry;
 extern uint64_t		sc_old_entry;
+
+extern void			aes_encoding(uint8_t *data, uint8_t *key);
 
 int64_t			get_fd_size(int fd) {
 	int64_t		size;
@@ -77,13 +80,39 @@ int		write_pad(int fd, uint64_t size) {
 	return (0);
 }
 
+int		str_cmp(uint8_t *s1, uint8_t *s2) {
+	for (; *s1 && *s1 == *s2; ++s1, ++s2);
+	return (*s1 - *s2);
+}
+
+int		enc_txt_s(uint8_t *m_src, Elf64_Ehdr *e_hdr, uint8_t *key) {
+	Elf64_Shdr	*s_stab, *s_txt, *s_hdr;
+	uint64_t	i;
+
+	if (e_hdr->e_shstrndx == SHN_UNDEF || e_hdr->e_shstrndx == SHN_XINDEX)
+		return (-1);
+	s_stab = (Elf64_Shdr *)(m_src + e_hdr->e_shoff) + e_hdr->e_shstrndx;
+	
+	for (i = 0, s_hdr = (Elf64_Shdr *)(m_src + e_hdr->e_shoff);
+			!s_txt && i < e_hdr->e_shnum; ++i, ++s_hdr)
+		if (!str_cmp(m_src + s_stab->sh_offset + s_hdr->sh_name, (uint8_t *)".text"))
+			s_txt = s_hdr;
+	if (!s_txt)
+		return (-1);
+	printf(".text @ 0x%lx\n", s_txt->sh_offset);
+	for (i = s_txt->sh_offset; i < s_txt->sh_offset + (s_txt->sh_size & BLOCK_MSK); i += 16)
+		aes_encoding(m_src + i, key);
+	return (0);
+}
+
 int		main(int argc, char **argv) {
 	int			src, dst;
-	uint64_t	i, m_sz, code_sz, data_sz, load_sz, m_space, f_space;
+	uint64_t	i, m_sz, code_sz, data_sz, load_sz, f_space; //m_space
 	int64_t		w_ret, s_ret;
 	uint8_t		*m_src;
 	Elf64_Ehdr	*e_hdr;
 	Elf64_Phdr	*p_hdr, *p_txt = NULL, *p_nxt;
+	uint8_t		key[] = "0123456789ABCDEF";
 
 	if (argc != 2)
 		error("need 1 argument");	
@@ -97,6 +126,8 @@ int		main(int argc, char **argv) {
 		error_fd(src, "can't map source file into memory");
 	close(src);
 	e_hdr = (Elf64_Ehdr *)m_src;
+
+	enc_txt_s(m_src, e_hdr, key);
 
 	code_sz = &sc_end - &sc;
 	data_sz = &sc_data_end - &sc_data;
@@ -112,14 +143,18 @@ int		main(int argc, char **argv) {
 		error_unmap(m_src, m_sz, "can't find needed segments");
 	p_nxt = p_hdr;
 
-	m_space = p_nxt->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz);
+	//m_space = p_nxt->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz);
 	f_space = p_nxt->p_offset - (p_txt->p_offset + p_txt->p_filesz);
 
-	if (m_space < load_sz)
+	if (f_space < load_sz)
 		error_unmap(m_src, m_sz, "no space found for injection");
 
+	/* Could be optimized
+	if (m_space < load_sz)
+		error_unmap(m_src, m_sz, "no space found for injection");
 	if (f_space < load_sz)
 		error_unmap(m_src, m_sz, "need to add padding");
+	*/
 
 	syscall(10, (uint64_t)&sc_data & PAGE_MSK, round_up(data_sz, PAGE_SZ),
 			PROT_READ | PROT_WRITE | PROT_EXEC);
