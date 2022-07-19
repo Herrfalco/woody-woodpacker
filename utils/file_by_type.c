@@ -30,7 +30,7 @@ int		main(int ac, char **av) {
 	uint64_t		i;
 	Elf64_Ehdr		hdr;
 	int				src;
-	char			file_path[BUFF_SZ], cmd[BUFF_SZ + 8];
+	char			file_path[BUFF_SZ];
 
 	if (ac != 3)
 		clean_exit(NULL, 0, "./file_by_type [DIR] [TYPE(DYN / EXEC)]");
@@ -45,10 +45,12 @@ int		main(int ac, char **av) {
 				fprintf(stderr, "File \"%s\": can't be opened\n", dir->d_name);
 			if (read(src, &hdr, sizeof(Elf64_Ehdr)) == -1)
 				clean_exit(d, src, "can't read source file");
-			if (hdr.e_type == ET_EXEC && !strcmp("EXEC", av[2]))
-				printf("%s\n", file_path);
-			else if (hdr.e_type == ET_DYN && !strcmp("DYN", av[2]))
-				printf("%s\n", file_path);
+			if (((uint8_t *)hdr.e_ident)[4] == ELFCLASS64) {
+				if (hdr.e_type == ET_EXEC && !strcmp("EXEC", av[2]))
+					printf("%s\n", file_path);
+				else if (hdr.e_type == ET_DYN && !strcmp("DYN", av[2]))
+					printf("%s\n", file_path);
+			}
 			close(src);
 		}
 	}
