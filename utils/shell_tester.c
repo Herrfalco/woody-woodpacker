@@ -49,6 +49,7 @@ int		main(int argc, char **argv) {
 	data_sz = &sc_data_end - &sc_data;
 	load_sz = data_sz + code_sz;
 
+	printf("Payload size: %ld\n", load_sz);
 	for (i = 0, success = 0, nb = 0; (dir = readdir(d)) != NULL; ++i) {
 		if (dir->d_type == DT_REG) {
 			sprintf(buff, "%s/%s", argv[1], dir->d_name);
@@ -68,7 +69,7 @@ int		main(int argc, char **argv) {
 						if (p_hdr->p_type == PT_LOAD && (p_hdr->p_flags & PF_X))
 							p_txt = p_hdr;
 					}
-					if (load_sz <= p_hdr->p_offset - (p_txt->p_offset + p_txt->p_filesz))
+					if (load_sz <= p_hdr->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz))
 						++success;
 					++nb;
 				}

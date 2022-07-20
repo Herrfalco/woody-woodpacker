@@ -64,6 +64,10 @@ int		main(int argc, char **argv) {
 					}
 					m_room = p_hdr->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz);
 					f_room = p_hdr->p_offset - (p_txt->p_offset + p_txt->p_filesz);
+					/*
+					if (f_room < 500 && m_room > 600)
+						printf("%s\n", buff);
+						*/
 					if (m_room < min)
 						min = m_room;
 					if (m_room > max)

@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 16:36:11 by fcadet            #+#    #+#             */
-/*   Updated: 2022/07/20 17:14:00 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/20 19:02:43 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ typedef struct		s_sizes {
 	uint64_t	code;
 	uint64_t	data;
 	uint64_t	load;
-	uint64_t	pad;
+	uint64_t	f_pad;
+	uint64_t	m_pad;
 }					t_sizes;
 
 extern uint8_t		sc;

@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/20 18:45:17 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/20 19:58:14 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,8 @@ static void		get_sizes(t_hdrs *hdrs, t_sizes *sz) {
 	sz->code = &sc_end - &sc;
 	sz->data = &sc_data_end - &sc_data;
 	sz->load = sz->data + sz->code;
-	sz->pad = hdrs->p_nxt->p_offset - (hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz);
+	sz->f_pad = hdrs->p_nxt->p_offset - (hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz);
+	sz->m_pad = hdrs->p_nxt->p_vaddr - (hdrs->p_txt->p_vaddr + hdrs->p_txt->p_memsz);
 }
 
 static void		update_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
@@ -100,7 +101,7 @@ static void		update_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
 	hdrs->p_txt->p_memsz += sz->load;
 }
 
-static void		write_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz) {
+static void		write_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, int x_pad) {
 	int				dst;
 	int64_t			w_ret;
 
@@ -111,17 +112,39 @@ static void		write_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz) {
 			|| (w_ret = write(dst, &sc, sz->load)) < 0
 			|| (uint64_t)w_ret != sz->load)
 		error_fd_unmap(dst, mem, sz->mem, "can't write to destination file");
-	if (write_pad(dst, sz->pad - sz->load))
-		error_fd_unmap(dst, mem, sz->mem, "can't write padding to destination file");
-	if ((w_ret = write(dst, mem + hdrs->elf->e_entry + sz->pad,
-					sz->mem - (hdrs->elf->e_entry + sz->pad))) < 0
-			|| (uint64_t)w_ret != sz->mem - (hdrs->elf->e_entry + sz->pad))
+	if (write_pad(dst, sz->f_pad + x_pad * PAGE_SZ - sz->load))
+		error_fd_unmap(dst, mem, sz->mem, "can't write f_padding to destination file");
+	if ((w_ret = write(dst, mem + hdrs->elf->e_entry + sz->f_pad,
+					sz->mem - (hdrs->elf->e_entry + sz->f_pad))) < 0
+			|| (uint64_t)w_ret != sz->mem - (hdrs->elf->e_entry + sz->f_pad))
 		error_fd_unmap(dst, mem, sz->mem, "can't write to destination file");
 	close(dst);
 }
 
+static void		set_x_pad(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, int *x_pad) {
+	Elf64_Phdr	*p_hdr;
+	Elf64_Shdr	*s_hdr;
+	uint64_t	i;
+
+	if (sz->f_pad < sz->load) {
+		if (sz->m_pad >= sz->load) {
+			for (i = 0, p_hdr = (Elf64_Phdr *)(mem + hdrs->elf->e_phoff);
+					i < hdrs->elf->e_phnum; ++i, ++p_hdr)
+				if (p_hdr->p_offset >= hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz)
+					p_hdr->p_offset += PAGE_SZ;
+			for (i = 0, s_hdr = (Elf64_Shdr *)(mem + hdrs->elf->e_shoff);
+					i < hdrs->elf->e_shnum; ++i, ++s_hdr)
+				if (s_hdr->sh_offset >= hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz)
+					s_hdr->sh_offset += PAGE_SZ;
+			*x_pad = 1;
+		} else
+			error_unmap(mem, sz->mem, "no space found for injection");
+	}
+}
+
 int		main(int argc, char **argv) {
 	uint8_t		*mem = NULL;
+	int			x_pad = 0;
 	t_hdrs		hdrs = { 0 };
 	t_sizes		sz = { 0 };
 	uint8_t		key[KEY_SZ / 8 + 1] = { 0 };
@@ -134,11 +157,10 @@ int		main(int argc, char **argv) {
 	enc_txt_sec(mem, &hdrs, &sz, key);
 	find_txt_seg(mem, &hdrs, &sz);
 	get_sizes(&hdrs, &sz);
-	if (sz.pad < sz.load)
-		error_unmap(mem, sz.mem, "no space found for injection");
-//	printf("key_value: %s\n", key);
+	set_x_pad(mem, &hdrs, &sz, &x_pad);
+	printf("key_value: %s\n", key);
 	update_mem(mem, &hdrs, &sz, key);
-	write_mem(mem, &hdrs, &sz);
+	write_mem(mem, &hdrs, &sz, x_pad);
 	munmap(mem, sz.mem);
 	return (0);
 }
