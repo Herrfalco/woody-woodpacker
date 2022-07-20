@@ -1,5 +1,6 @@
 NAME	=	elf64
-SRCS	=	elf64.c
+SRCS	=	elf64.c \
+			utils.c
 SCODE	=	shell_code.asm
 OSCODE	= 	$(SCODE:.asm=.o)
 OBJS	=	$(SRCS:.c=.o)
