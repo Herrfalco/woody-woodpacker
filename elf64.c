@@ -6,11 +6,29 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/20 18:06:22 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/20 18:45:17 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes.h"
+
+static void		rand_key_gen(uint8_t *key) {
+	int			fd = open("/dev/urandom", O_RDONLY);
+	size_t		i;
+
+	if (fd < 0 || read(fd, key, KEY_SZ / 8) != KEY_SZ / 8)
+		error_fd(fd, "can't generate random key");	
+	for (i = 0; i < KEY_SZ / 8; ++i) {
+		key[i] = key[i] % 62;
+		if (key[i] < 10)
+			key[i] += '0';
+		else if (key[i] < 36)
+			key[i] += 'A' - 10;
+		else
+			key[i] += 'a' - 36;
+	}
+	close(fd);
+}
 
 static void		map_file(char *path, uint8_t **mem, t_sizes *sz) {
 	int			src;
@@ -65,11 +83,12 @@ static void		get_sizes(t_hdrs *hdrs, t_sizes *sz) {
 	sz->pad = hdrs->p_nxt->p_offset - (hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz);
 }
 
-static void		update_mem(t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
+static void		update_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
 	uint64_t		i;
 
-	syscall(10, (uint64_t)&sc_data & PAGE_MSK, round_up(sz->data, PAGE_SZ),
-			PROT_READ | PROT_WRITE | PROT_EXEC);
+	if (syscall(10, (uint64_t)&sc_data & PAGE_MSK, round_up(sz->data, PAGE_SZ),
+			PROT_READ | PROT_WRITE | PROT_EXEC) < 0)
+		error_unmap(mem, sz->mem, "can't update variables in mapped file");
 	sc_entry = hdrs->p_txt->p_vaddr + hdrs->p_txt->p_memsz;
 	sc_old_entry = hdrs->elf->e_entry;
 	sc_text_addr = hdrs->s_txt->sh_addr;
@@ -105,10 +124,11 @@ int		main(int argc, char **argv) {
 	uint8_t		*mem = NULL;
 	t_hdrs		hdrs = { 0 };
 	t_sizes		sz = { 0 };
-	uint8_t		key[] = "0123456789ABCDEF";
+	uint8_t		key[KEY_SZ / 8 + 1] = { 0 };
 
 	if (argc != 2)
 		error("need 1 argument");	
+	rand_key_gen(key);
 	map_file(argv[1], &mem, &sz);
 	hdrs.elf = (Elf64_Ehdr *)mem;
 	enc_txt_sec(mem, &hdrs, &sz, key);
@@ -116,7 +136,8 @@ int		main(int argc, char **argv) {
 	get_sizes(&hdrs, &sz);
 	if (sz.pad < sz.load)
 		error_unmap(mem, sz.mem, "no space found for injection");
-	update_mem(&hdrs, &sz, key);
+//	printf("key_value: %s\n", key);
+	update_mem(mem, &hdrs, &sz, key);
 	write_mem(mem, &hdrs, &sz);
 	munmap(mem, sz.mem);
 	return (0);
