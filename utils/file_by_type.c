@@ -30,7 +30,7 @@ int		main(int ac, char **av) {
 	uint64_t		i;
 	Elf64_Ehdr		hdr;
 	int				src;
-	char			file_path[BUFF_SZ], cmd[BUFF_SZ + 8];
+	char			file_path[BUFF_SZ];
 
 	if (ac != 3)
 		clean_exit(NULL, 0, "./file_by_type [DIR] [TYPE(DYN / EXEC)]");
@@ -40,7 +40,7 @@ int		main(int ac, char **av) {
 		clean_exit(NULL, 0, "can't open source directory");
 	for (i = 0; (dir = readdir(d)) != NULL; ++i) {
 		if (dir->d_type == DT_REG) {
-			sprintf(file_path, "%s%s", av[1], dir->d_name);
+			sprintf(file_path, "%s/%s", av[1], dir->d_name);
 			if ((src = open(file_path, O_RDONLY)) < 0)
 				fprintf(stderr, "File \"%s\": can't be opened\n", dir->d_name);
 			if (read(src, &hdr, sizeof(Elf64_Ehdr)) == -1)
