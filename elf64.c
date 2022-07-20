@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/20 14:48:00 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/20 15:06:06 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,7 @@ int		main(int argc, char **argv) {
 	code_sz = &sc_end - &sc;
 	data_sz = &sc_data_end - &sc_data;
 	load_sz = data_sz + code_sz;
+	printf("load_sz=%ld\n", load_sz);
 	
 	for (i = 0, p_hdr = (Elf64_Phdr *)(m_src + e_hdr->e_phoff);
 			!p_txt && i < e_hdr->e_phnum; ++i, ++p_hdr) {
