@@ -62,7 +62,8 @@ int		main(int argc, char **argv) {
 				quit_dir_fd_unmap(d, src, NULL, 0, "can't map source file into memory");
 			if (!strncmp((char *)m_src, "\x7f" "ELF", 4)) {
 				e_hdr = (Elf64_Ehdr *)m_src;
-				if (e_hdr->e_type == ET_DYN && ((uint8_t *)e_hdr->e_ident)[4] == ELFCLASS64) {
+				if ((e_hdr->e_type == ET_DYN || e_hdr->e_type == ET_EXEC)
+						&& ((uint8_t *)e_hdr->e_ident)[4] == ELFCLASS64) {
 					p_txt = NULL;
 					for (i = 0, p_hdr = (Elf64_Phdr *)(m_src + e_hdr->e_phoff);
 							!p_txt && i < e_hdr->e_phnum; ++i, ++p_hdr) {
