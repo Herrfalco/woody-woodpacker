@@ -1,5 +1,5 @@
-NAME	=	elf64
-SRCS	=	elf64.c \
+NAME	=	woody_woodpacker
+SRCS	=	woody_woodpacker.c \
 			utils.c
 SCODE	=	shell_code.asm
 OSCODE	= 	$(SCODE:.asm=.o)
@@ -7,7 +7,7 @@ OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
 AS		=	nasm
 AFLAGS	=	-felf64
-CFLAGS	=	-no-pie -Wall -Wextra #-Werror
+CFLAGS	=	-no-pie -Wall -Wextra -Werror
 RM		=	rm -rf
 GARB	=	woody
 
