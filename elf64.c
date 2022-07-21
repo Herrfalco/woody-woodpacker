@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/20 19:58:14 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/21 12:34:10 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,22 +38,33 @@ static void		map_file(char *path, uint8_t **mem, t_sizes *sz) {
 		error("can't open source file");	
 	if ((s_ret = get_fd_size(src)) < 0)
 		error_fd(src, "can't get source file size");
-	sz->mem = (uint64_t)s_ret;
-	if ((*mem = mmap(NULL, sz->mem, PROT_READ | PROT_WRITE, MAP_PRIVATE, src, 0)) == MAP_FAILED)
+	if ((sz->mem = (uint64_t)s_ret) < sizeof(Elf64_Ehdr))
+		error_fd(src, "not an ELF64 binary file");
+	if ((*mem = mmap(NULL, sz->mem,
+					PROT_READ | PROT_WRITE, MAP_PRIVATE, src, 0)) == MAP_FAILED)
 		error_fd(src, "can't map source file into memory");
 	close(src);
+}
+
+static void		test_elf_hdr(uint8_t *mem, t_sizes *sz, t_hdrs *hdrs) {
+	if (str_n_cmp((uint8_t *)hdrs->elf->e_ident, (uint8_t *)(IDENT), 5))
+		error_unmap(mem, sz->mem, "not an ELF64 binary file");
+	if (hdrs->elf->e_type != ET_EXEC && hdrs->elf->e_type != ET_DYN)
+		error_unmap(mem, sz->mem, "unsupported ELF64 binary file type");
+	if (hdrs->elf->e_machine != EM_X86_64)
+		error_unmap(mem, sz->mem, "unsupported ELF64 binary file architechture");
+	if (hdrs->elf->e_shstrndx == SHN_UNDEF || hdrs->elf->e_shstrndx == SHN_XINDEX)
+		error_unmap(mem, sz->mem, "can't find section name string table");
 }
 
 static void		enc_txt_sec(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
 	Elf64_Shdr	*s_stab, *s_hdr;
 	uint64_t	i;
 
-	if (hdrs->elf->e_shstrndx == SHN_UNDEF || hdrs->elf->e_shstrndx == SHN_XINDEX)
-		error_unmap(mem, sz->mem, "can't find .text section");
 	s_stab = (Elf64_Shdr *)(mem + hdrs->elf->e_shoff) + hdrs->elf->e_shstrndx;
 	for (i = 0, s_hdr = (Elf64_Shdr *)(mem + hdrs->elf->e_shoff);
 			!hdrs->s_txt && i < hdrs->elf->e_shnum; ++i, ++s_hdr)
-		if (!str_cmp(mem + s_stab->sh_offset + s_hdr->sh_name, (uint8_t *)".text"))
+		if (!str_n_cmp(mem + s_stab->sh_offset + s_hdr->sh_name, (uint8_t *)".text", -1))
 			hdrs->s_txt = s_hdr;
 	if (!hdrs->s_txt)
 		error_unmap(mem, sz->mem, "can't find .text section");
@@ -104,19 +115,21 @@ static void		update_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, uint8_t *key) {
 static void		write_mem(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, int x_pad) {
 	int				dst;
 	int64_t			w_ret;
+	uint64_t		code_offset;
 
 	if ((dst = open("woody", O_WRONLY | O_CREAT | O_TRUNC, 0777)) < 0)
 		error_unmap(mem, sz->mem, "can't open destination file");	
-	if ((w_ret = write(dst, mem, hdrs->elf->e_entry)) < 0
-			|| (uint64_t)w_ret != hdrs->elf->e_entry
+	code_offset = hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz - sz->load;
+	if ((w_ret = write(dst, mem, code_offset)) < 0
+			|| (uint64_t)w_ret != code_offset
 			|| (w_ret = write(dst, &sc, sz->load)) < 0
 			|| (uint64_t)w_ret != sz->load)
 		error_fd_unmap(dst, mem, sz->mem, "can't write to destination file");
 	if (write_pad(dst, sz->f_pad + x_pad * PAGE_SZ - sz->load))
 		error_fd_unmap(dst, mem, sz->mem, "can't write f_padding to destination file");
-	if ((w_ret = write(dst, mem + hdrs->elf->e_entry + sz->f_pad,
-					sz->mem - (hdrs->elf->e_entry + sz->f_pad))) < 0
-			|| (uint64_t)w_ret != sz->mem - (hdrs->elf->e_entry + sz->f_pad))
+	if ((w_ret = write(dst, mem + code_offset + sz->f_pad,
+					sz->mem - (code_offset + sz->f_pad))) < 0
+			|| (uint64_t)w_ret != sz->mem - (code_offset + sz->f_pad))
 		error_fd_unmap(dst, mem, sz->mem, "can't write to destination file");
 	close(dst);
 }
@@ -154,6 +167,7 @@ int		main(int argc, char **argv) {
 	rand_key_gen(key);
 	map_file(argv[1], &mem, &sz);
 	hdrs.elf = (Elf64_Ehdr *)mem;
+	test_elf_hdr(mem, &sz, &hdrs);
 	enc_txt_sec(mem, &hdrs, &sz, key);
 	find_txt_seg(mem, &hdrs, &sz);
 	get_sizes(&hdrs, &sz);

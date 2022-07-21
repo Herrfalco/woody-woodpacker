@@ -6,7 +6,7 @@
 /*   By: fcadet <fcadet@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/20 16:35:16 by fcadet            #+#    #+#             */
-/*   Updated: 2022/07/20 17:13:29 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/21 12:25:51 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,10 @@ uint64_t		round_up(uint64_t val, uint64_t mod) {
 	return (val % mod ? (val / mod) * mod + mod : val);
 }
 
-int		str_cmp(uint8_t *s1, uint8_t *s2) {
-	for (; *s1 && *s1 == *s2; ++s1, ++s2);
+int		str_n_cmp(uint8_t *s1, uint8_t *s2, int n) {
+	for (; *s1 && *s1 == *s2; ++s1, ++s2)
+		if (!--n)
+			break;
 	return (*s1 - *s2);
 }
 
