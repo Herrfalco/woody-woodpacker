@@ -14,25 +14,27 @@
 
 		global				aes_encoding
 
+		default				rel
+
 sc:
 		push				rdi
 		push				rsi
 		push				rdx
 
 		mov					rdi,				1
-		lea					rsi,				[rel sc_msg]
+		lea					rsi,				[sc_msg]
 		mov					rdx,				sc_msg_end - sc_msg
 		mov					rax,				1
 		syscall
 
-		lea					rax,				[rel sc]
-		sub					rax,				qword[rel sc_entry]
+		lea					rax,				[sc]
+		sub					rax,				qword[sc_entry]
 		push				rax
 
-		mov					rdi,				qword[rel sc_text_addr]
+		mov					rdi,				qword[sc_text_addr]
 		add					rdi,				qword[rsp]
 		and					rdi,				0xfffffffffffff000
-		mov					rsi,				qword[rel sc_text_sz]
+		mov					rsi,				qword[sc_text_sz]
 		add					rsi,				0x1000
 		mov					rdx,				0x7
 		mov					rax,				10
@@ -40,13 +42,13 @@ sc:
 
 		xor					rcx,				rcx
 	.loop:
-		cmp					rcx,				qword[rel sc_text_sz]
+		cmp					rcx,				qword[sc_text_sz]
 		je					.end
 
-		mov					rdi,				qword[rel sc_text_addr]
+		mov					rdi,				qword[sc_text_addr]
 		add					rdi,				qword[rsp]
 		add					rdi,				rcx
-		lea					rsi,				[rel sc_key]
+		lea					rsi,				[sc_key]
 		call				aes_decoding
 
 		add					rcx,				16
@@ -58,7 +60,7 @@ sc:
 		pop					rsi
 		pop					rdi
 
-		add					rax,				qword[rel sc_old_entry]
+		add					rax,				qword[sc_old_entry]
 		jmp					rax
 
 aes_round_keys:
