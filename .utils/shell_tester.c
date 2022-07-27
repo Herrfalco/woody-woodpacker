@@ -70,8 +70,11 @@ int		main(int argc, char **argv) {
 						if (p_hdr->p_type == PT_LOAD && (p_hdr->p_flags & PF_X))
 							p_txt = p_hdr;
 					}
-					if (load_sz <= p_hdr->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz))
+					if (load_sz <= p_hdr->p_vaddr - (p_txt->p_vaddr + p_txt->p_memsz)) {
+						if (load_sz > p_hdr->p_offset - (p_txt->p_offset + p_txt->p_filesz))
+							printf("%s\n", buff);
 						++success;
+					}
 					++nb;
 				}
 			}

@@ -6,7 +6,7 @@
 /*   By: herrfalco <marvin@42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 22:56:40 by herrfalco         #+#    #+#             */
-/*   Updated: 2022/07/21 12:34:10 by fcadet           ###   ########.fr       */
+/*   Updated: 2022/07/27 22:19:51 by fcadet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,10 @@ static void		set_x_pad(uint8_t *mem, t_hdrs *hdrs, t_sizes *sz, int *x_pad) {
 					i < hdrs->elf->e_shnum; ++i, ++s_hdr)
 				if (s_hdr->sh_offset >= hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz)
 					s_hdr->sh_offset += PAGE_SZ;
+			if (hdrs->elf->e_phoff >= hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz) 
+				hdrs->elf->e_phoff += PAGE_SZ;
+			if (hdrs->elf->e_shoff >= hdrs->p_txt->p_offset + hdrs->p_txt->p_filesz) 
+				hdrs->elf->e_shoff += PAGE_SZ;
 			*x_pad = 1;
 		} else
 			error_unmap(mem, sz->mem, "no space found for injection");
